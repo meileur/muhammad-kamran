@@ -579,4 +579,45 @@ def run_tfidf_ngram_cosinesim():
     dfAll = pkl_utils._load(config.ALL_DATA_LEMMATIZED_STEMMED)
     dfAll.drop(["product_attribute_list"], inplace=True, axis=1)
 
-    generators = [TFIDF_Word_Ngram_Cosin
+    generators = [TFIDF_Word_Ngram_CosineSim, TFIDF_Char_Ngram_CosineSim]
+    ngrams_list = [[1,2,3], [2,3,4,5]]
+    ngrams_list = [[3], [4]]
+    obs_fields_list = []
+    target_fields_list = []
+    obs_fields_list.append( ["search_term", "search_term_alt", "search_term_auto_corrected"][:1] )
+    target_fields_list.append( ["product_title", "product_description", "product_attribute"] )
+    for obs_fields, target_fields in zip(obs_fields_list, target_fields_list):
+        for generator,ngrams in zip(generators, ngrams_list):
+            for ngram in ngrams:
+                param_list = [ngram]
+                pf = PairwiseFeatureWrapper(generator, dfAll, obs_fields, target_fields, param_list, config.FEAT_DIR, logger)
+                pf.go()
+
+
+def run_char_dist_sim():
+    logname = "generate_feature_char_dist_sim_%s.log"%time_utils._timestamp()
+    logger = logging_utils._get_logger(config.LOG_DIR, logname)
+    dfAll = pkl_utils._load(config.ALL_DATA_LEMMATIZED_STEMMED)
+    dfAll.drop(["product_attribute_list"], inplace=True, axis=1)
+    
+    generators = [CharDistribution_Ratio, CharDistribution_CosineSim, CharDistribution_KL]
+    obs_fields_list = []
+    target_fields_list = []
+    obs_fields_list.append( ["search_term", "search_term_alt", "search_term_auto_corrected"][:1] )
+    target_fields_list.append( ["product_title", "product_description", "product_attribute"] )
+    for obs_fields, target_fields in zip(obs_fields_list, target_fields_list):
+        for generator in generators:
+            param_list = []
+            pf = PairwiseFeatureWrapper(generator, dfAll, obs_fields, target_fields, param_list, config.FEAT_DIR, logger)
+            pf.go()
+
+
+if __name__ == "__main__":
+
+    run_char_dist_sim()
+    run_tfidf_ngram_cosinesim()
+    run_lsa_ngram_cosinesim()
+    run_lsa_ngram()
+    run_lsa_ngram_pair()
+    run_lsa_ngram_cooc()
+    # run_tsne_lsa_ngram()
