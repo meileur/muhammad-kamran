@@ -372,4 +372,211 @@ class LSA_Char_Ngram_CosineSim(VectorSpace):
         svd.fit(scipy.sparse.vstack((X_obs, X_target)))
         X_obs = svd.transform(X_obs)
         X_target = svd.transform(X_target)
-        #
+        ## cosine similarity
+        sim = list(map(dist_utils._cosine_sim, X_obs, X_target))
+        sim = np.asarray(sim).squeeze()
+        return sim
+
+
+# ------------------- Char Distribution Based features ------------------
+# 2nd in CrowdFlower (preprocessing_stanislav.py)
+class CharDistribution(VectorSpace):
+    def __init__(self, obs_corpus, target_corpus):
+        self.obs_corpus = obs_corpus
+        self.target_corpus = target_corpus
+
+    def normalize(self, text):
+        # pat = re.compile("[a-z0-9]")
+        pat = re.compile("[a-z]")
+        group = pat.findall(text.lower())
+        if group is None:
+            res = " "
+        else:
+            res = "".join(group)
+            res += " "
+        return res
+
+    def preprocess(self, corpus):
+        return [self.normalize(text) for text in corpus]
+
+    def get_distribution(self):
+        ## obs tfidf
+        tfidf = self._init_char_tfidf()
+        X_obs = tfidf.fit_transform(self.preprocess(self.obs_corpus)).todense()
+        X_obs = np.asarray(X_obs)
+        # apply laplacian smoothing
+        s = 1.
+        X_obs = (X_obs + s) / (np.sum(X_obs, axis=1)[:,None] + X_obs.shape[1]*s)
+        ## targetument tfidf
+        tfidf = self._init_char_tfidf()
+        X_target = tfidf.fit_transform(self.preprocess(self.target_corpus)).todense()
+        X_target = np.asarray(X_target)
+        X_target = (X_target + s) / (np.sum(X_target, axis=1)[:,None] + X_target.shape[1]*s)
+        return X_obs, X_target
+
+
+class CharDistribution_Ratio(CharDistribution):
+    def __init__(self, obs_corpus, target_corpus, const_A=1., const_B=1.):
+        super().__init__(obs_corpus, target_corpus)
+        self.const_A = const_A
+        self.const_B = const_B
+        
+    def __name__(self):
+        return "CharDistribution_Ratio"
+
+    def transform(self):
+        X_obs, X_target = self.get_distribution()
+        ratio = (X_obs + self.const_A) / (X_target + self.const_B)
+        return ratio
+
+
+class CharDistribution_CosineSim(CharDistribution):
+    def __init__(self, obs_corpus, target_corpus):
+        super().__init__(obs_corpus, target_corpus)
+        
+    def __name__(self):
+        return "CharDistribution_CosineSim"
+
+    def transform(self):
+        X_obs, X_target = self.get_distribution()
+        ## cosine similarity
+        sim = list(map(dist_utils._cosine_sim, X_obs, X_target))
+        sim = np.asarray(sim).squeeze()
+        return sim
+
+
+class CharDistribution_KL(CharDistribution):
+    def __init__(self, obs_corpus, target_corpus):
+        super().__init__(obs_corpus, target_corpus)
+        
+    def __name__(self):
+        return "CharDistribution_KL"
+
+    def transform(self):
+        X_obs, X_target = self.get_distribution()
+        ## KL
+        kl = dist_utils._KL(X_obs, X_target)
+        return kl
+
+
+# -------------------------------- Main ----------------------------------
+def run_lsa_ngram():
+    logname = "generate_feature_lsa_ngram_%s.log"%time_utils._timestamp()
+    logger = logging_utils._get_logger(config.LOG_DIR, logname)
+    dfAll = pkl_utils._load(config.ALL_DATA_LEMMATIZED_STEMMED)
+    dfAll.drop(["product_attribute_list"], inplace=True, axis=1)
+
+    generators = [LSA_Word_Ngram, LSA_Char_Ngram]
+    ngrams_list = [[1,2,3], [2,3,4,5]]
+    ngrams_list = [[3], [4]]
+    # obs_fields = ["search_term", "search_term_alt", "search_term_auto_corrected", "product_title", "product_description"]
+    obs_fields = ["search_term", "product_title", "product_description"]
+    for generator,ngrams in zip(generators, ngrams_list):
+        for ngram in ngrams:
+            param_list = [ngram, config.SVD_DIM, config.SVD_N_ITER]
+            sf = StandaloneFeatureWrapper(generator, dfAll, obs_fields, param_list, config.FEAT_DIR, logger)
+            sf.go()
+
+
+def run_lsa_ngram_cooc():
+    logname = "generate_feature_lsa_ngram_cooc_%s.log"%time_utils._timestamp()
+    logger = logging_utils._get_logger(config.LOG_DIR, logname)
+    dfAll = pkl_utils._load(config.ALL_DATA_LEMMATIZED_STEMMED)
+    dfAll.drop(["product_attribute_list"], inplace=True, axis=1)
+
+    generators = [LSA_Word_Ngram_Cooc]
+    obs_ngrams = [1, 2]
+    target_ngrams = [1, 2]
+    obs_fields_list = []
+    target_fields_list = []
+    obs_fields_list.append( ["search_term", "search_term_alt", "search_term_auto_corrected"][:1] )
+    target_fields_list.append( ["product_title", "product_description"][:1] )
+    for obs_fields, target_fields in zip(obs_fields_list, target_fields_list):
+        for obs_ngram in obs_ngrams:
+            for target_ngram in target_ngrams:
+                for generator in generators:
+                    param_list = [obs_ngram, target_ngram, config.SVD_DIM, config.SVD_N_ITER]
+                    pf = PairwiseFeatureWrapper(generator, dfAll, obs_fields, target_fields, param_list, config.FEAT_DIR, logger)
+                    pf.go()
+
+
+def run_lsa_ngram_pair():
+    logname = "generate_feature_lsa_ngram_pair_%s.log"%time_utils._timestamp()
+    logger = logging_utils._get_logger(config.LOG_DIR, logname)
+    dfAll = pkl_utils._load(config.ALL_DATA_LEMMATIZED_STEMMED)
+    dfAll.drop(["product_attribute_list"], inplace=True, axis=1)
+
+    generators = [LSA_Word_Ngram_Pair]
+    ngrams = [1, 2]
+    obs_fields_list = []
+    target_fields_list = []
+    obs_fields_list.append( ["search_term", "search_term_alt", "search_term_auto_corrected"][:1] )
+    target_fields_list.append( ["product_title", "product_description"] )
+    for obs_fields, target_fields in zip(obs_fields_list, target_fields_list):
+        for ngram in ngrams:
+            for generator in generators:
+                param_list = [ngram, config.SVD_DIM, config.SVD_N_ITER]
+                pf = PairwiseFeatureWrapper(generator, dfAll, obs_fields, target_fields, param_list, config.FEAT_DIR, logger)
+                pf.go()
+
+
+# memory error (use feature_tsne.R instead)
+def run_tsne_lsa_ngram():
+    logname = "generate_feature_tsne_lsa_ngram_%s.log"%time_utils._timestamp()
+    logger = logging_utils._get_logger(config.LOG_DIR, logname)
+    dfAll = pkl_utils._load(config.ALL_DATA_LEMMATIZED_STEMMED)
+    dfAll.drop(["product_attribute_list"], inplace=True, axis=1)
+
+    generators = [TSNE_LSA_Word_Ngram, TSNE_LSA_Char_Ngram]
+    ngrams_list = [[1,2,3], [2,3,4,5]]
+    ngrams_list = [[3], [4]]
+    # obs_fields = ["search_term", "search_term_alt", "search_term_auto_corrected", "product_title", "product_description"]
+    obs_fields = ["search_term", "product_title", "product_description"]
+    for generator,ngrams in zip(generators, ngrams_list):
+        for ngram in ngrams:
+            param_list = [ngram, config.SVD_DIM, config.SVD_N_ITER]
+            sf = StandaloneFeatureWrapper(generator, dfAll, obs_fields, param_list, config.FEAT_DIR, logger, force_corr=True)
+            sf.go()
+
+    generators = [TSNE_LSA_Word_Ngram_Pair]
+    ngrams = [1, 2]
+    obs_fields_list = []
+    target_fields_list = []
+    obs_fields_list.append( ["search_term", "search_term_alt", "search_term_auto_corrected"][:1] )
+    target_fields_list.append( ["product_title", "product_description"] )
+    for obs_fields, target_fields in zip(obs_fields_list, target_fields_list):
+        for ngram in ngrams:
+            for generator in generators:
+                param_list = [ngram, config.SVD_DIM, config.SVD_N_ITER]
+                pf = PairwiseFeatureWrapper(generator, dfAll, obs_fields, target_fields, param_list, config.FEAT_DIR, logger, force_corr=True)
+                pf.go()
+
+
+def run_lsa_ngram_cosinesim():
+    logname = "generate_feature_lsa_ngram_cosinesim_%s.log"%time_utils._timestamp()
+    logger = logging_utils._get_logger(config.LOG_DIR, logname)
+    dfAll = pkl_utils._load(config.ALL_DATA_LEMMATIZED_STEMMED)
+    dfAll.drop(["product_attribute_list"], inplace=True, axis=1)
+
+    generators = [LSA_Word_Ngram_CosineSim, LSA_Char_Ngram_CosineSim]
+    ngrams_list = [[1,2,3], [2,3,4,5]]
+    ngrams_list = [[3], [4]]
+    obs_fields_list = []
+    target_fields_list = []
+    obs_fields_list.append( ["search_term", "search_term_alt", "search_term_auto_corrected"][:1] )
+    target_fields_list.append( ["product_title", "product_description", "product_attribute"] )
+    for obs_fields, target_fields in zip(obs_fields_list, target_fields_list):
+        for generator,ngrams in zip(generators, ngrams_list):
+            for ngram in ngrams:
+                param_list = [ngram, config.SVD_DIM, config.SVD_N_ITER]
+                pf = PairwiseFeatureWrapper(generator, dfAll, obs_fields, target_fields, param_list, config.FEAT_DIR, logger)
+                pf.go()
+
+
+def run_tfidf_ngram_cosinesim():
+    logname = "generate_feature_tfidf_ngram_cosinesim_%s.log"%time_utils._timestamp()
+    logger = logging_utils._get_logger(config.LOG_DIR, logname)
+    dfAll = pkl_utils._load(config.ALL_DATA_LEMMATIZED_STEMMED)
+    dfAll.drop(["product_attribute_list"], inplace=True, axis=1)
+
+    generators = [TFIDF_Word_Ngram_Cosin
