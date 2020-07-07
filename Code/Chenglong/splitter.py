@@ -150,4 +150,71 @@ class HomedepotSplitter:
             if self.verbose:
                 print("-"*50)
                 print("Index for run: %s" % (run+1))
-        
+                print("Train (num = %s)" % len(trainInd))
+                print(trainInd[:10])
+                print("Valid (num = %s)" % len(validInd))
+                print(validInd[:10])
+
+        return self
+
+    def save(self, fname):
+        pkl_utils._save(fname, self.splits)
+
+
+def main():
+    
+    dfTrain = pd.read_csv(config.TRAIN_DATA, encoding="ISO-8859-1")
+    dfTest = pd.read_csv(config.TEST_DATA, encoding="ISO-8859-1")
+
+
+    # splits for level1
+    splitter = HomedepotSplitter(dfTrain=dfTrain, 
+                                dfTest=dfTest, 
+                                n_iter=config.N_RUNS, 
+                                random_state=config.RANDOM_SEED, 
+                                verbose=True,
+                                plot=True,
+                                # tune these params to get a close distribution
+                                split_param=[0.5, 0.25, 0.5],
+                                )
+    splitter.split()
+    splitter.save("%s/splits_level1.pkl"%config.SPLIT_DIR)
+    splits_level1 = splitter.splits
+
+
+    ## splits for level2
+    splits_level1 = pkl_utils._load("%s/splits_level1.pkl"%config.SPLIT_DIR)
+    splits_level2 = [0]*config.N_RUNS
+    for run, (trainInd, validInd) in enumerate(splits_level1):
+        dfValid = dfTrain.iloc[validInd].copy()
+        splitter2 = HomedepotSplitter(dfTrain=dfValid, 
+                                    dfTest=dfTest, 
+                                    n_iter=1, 
+                                    random_state=run, 
+                                    verbose=True,
+                                    # tune these params to get a close distribution
+                                    split_param=[0.5, 0.15, 0.6])
+        splitter2.split()
+        splits_level2[run] = splitter2.splits[0]
+    pkl_utils._save("%s/splits_level2.pkl"%config.SPLIT_DIR, splits_level2)
+
+
+    ## splits for level3
+    splits_level2 = pkl_utils._load("%s/splits_level2.pkl"%config.SPLIT_DIR)
+    splits_level3 = [0]*config.N_RUNS
+    for run, (trainInd, validInd) in enumerate(splits_level2):
+        dfValid = dfTrain.iloc[validInd].copy()
+        splitter3 = HomedepotSplitter(dfTrain=dfValid, 
+                                    dfTest=dfTest, 
+                                    n_iter=1, 
+                                    random_state=run, 
+                                    verbose=True,
+                                    # tune these params to get a close distribution
+                                    split_param=[0.5, 0.15, 0.7])
+        splitter3.split()
+        splits_level3[run] = splitter3.splits[0]
+    pkl_utils._save("%s/splits_level3.pkl"%config.SPLIT_DIR, splits_level3)
+
+
+if __name__ == "__main__":
+    main()
