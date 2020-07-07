@@ -247,4 +247,69 @@ class AutoSpellingChecker:
         return words
 
     # for estimating P(w|c)
-    def build_erro
+    def build_error_correction_pairs(self):
+        columns = ["product_title", "product_description"]
+        pairs = []
+        for col in columns:
+            for query,title in zip(self.dfAll["search_term_words"], self.dfAll["%s_words"%col]):
+                for word in query:
+                    pairs.extend( [(word,c) for c in title] )
+        return pairs
+
+    def build_spelling_checker(self):
+        checker = PeterNovigSpellingChecker(self.words, self.error_correction_pairs,
+                    self.exclude_stopwords, self.cutoff)
+        return checker
+
+    def autocorrect_query(self, query):
+        # correct bigram
+        bigram_corrector = {}
+        words_bigram = self.get_valid_bigram_words(query.split(" "))
+        for word in words_bigram:
+            corrected_word = self.spelling_checker.correct(word)
+            if word != corrected_word:
+                bigram_corrector[word] = corrected_word
+
+        for k,v in bigram_corrector.items():
+            pattern = regex.compile(r"(?<=\W|^)%s(?=\W|$)"%k)
+            query = regex.sub(pattern, v, query)
+
+        # correct unigram
+        corrected_query = []
+        for word in query.split(" "):
+            if len(word) < self.min_len:
+                corrected_query.append(word)
+            elif self.exclude_stopwords and word in config.STOP_WORDS:
+                corrected_query.append(word)
+            elif self.skip_digit and len(re.findall(re.compile("\d+"), word)):
+                corrected_query.append(word)
+            else:
+                corrected_word = self.spelling_checker.correct(word)
+                if len(corrected_word) < self.min_len:
+                    corrected_query.append(word)
+                else:
+                    corrected_query.append( corrected_word )
+        return " ".join(corrected_query)
+
+    def build_query_correction_map(self):
+        queries = list(set(self.dfAll["search_term"]))
+        if self.n_jobs == 1:
+            corrected_queries = []
+            for query in queries:
+                corrected_queries.append( self.autocorrect_query(query) )
+        else:
+            p = multiprocessing.Pool(self.n_jobs)
+            corrected_queries = p.imap(self.autocorrect_query, queries)
+        query_correction_map = dict(zip(queries, corrected_queries))
+        return query_correction_map
+
+    def correct(self, query):
+        return self.query_correction_map.get(query, query)
+
+    def save_query_correction_map(self, fname):
+        with open(fname, "w") as f:
+            f.write("%30s \t %30s\n"%("original query", "corrected query"))
+            for query,corrected_query in sorted(self.query_correction_map.items()):
+                if query != corrected_query:
+                    res = "%30s \t %30s\n"%(query, corrected_query)
+                    f.write(res)
