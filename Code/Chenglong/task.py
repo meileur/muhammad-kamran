@@ -384,4 +384,109 @@ class StackingTask(Task):
 
         # submission
         fname = "%s/test.pred.%s.[Mean%.6f]_[Std%.6f].csv"%(
-            config.SUBM_DIR, self.__str__(), self.rmse_cv_mean, self.rmse_cv_
+            config.SUBM_DIR, self.__str__(), self.rmse_cv_mean, self.rmse_cv_std)
+        pd.DataFrame({"id": id_test, "relevance": y_pred}).to_csv(fname, index=False)
+        return self
+
+
+class TaskOptimizer:
+    def __init__(self, task_mode, learner_name, feature_name, logger, 
+                    max_evals=100, verbose=True, refit_once=False, plot_importance=False):
+        self.task_mode = task_mode
+        self.learner_name = learner_name
+        self.feature_name = feature_name
+        self.feature = self._get_feature()
+        self.logger = logger
+        self.max_evals = max_evals
+        self.verbose = verbose
+        self.refit_once = refit_once
+        self.plot_importance = plot_importance
+        self.trial_counter = 0
+        self.model_param_space = ModelParamSpace(self.learner_name)
+
+    def _get_feature(self):
+        if self.task_mode == "single":
+            feature = Feature(self.feature_name)
+        elif self.task_mode == "stacking":
+            feature = StackingFeature(self.feature_name)
+        return feature
+
+    def _obj(self, param_dict):
+        self.trial_counter += 1
+        param_dict = self.model_param_space._convert_int_param(param_dict)
+        learner = Learner(self.learner_name, param_dict)
+        suffix = "_[Id@%s]"%str(self.trial_counter)
+        if self.task_mode == "single":
+            self.task = Task(learner, self.feature, suffix, self.logger, self.verbose, self.plot_importance)
+        elif self.task_mode == "stacking":
+            self.task = StackingTask(learner, self.feature, suffix, self.logger, self.verbose, self.refit_once)
+        self.task.go()
+        ret = {
+            "loss": self.task.rmse_cv_mean,
+            "attachments": {
+                "std": self.task.rmse_cv_std,
+            },
+            "status": STATUS_OK,
+        }
+        return ret
+
+    def run(self):
+        start = time.time()
+        trials = Trials()
+        best = fmin(self._obj, self.model_param_space._build_space(), tpe.suggest, self.max_evals, trials)
+        best_params = space_eval(self.model_param_space._build_space(), best)
+        best_params = self.model_param_space._convert_int_param(best_params)
+        trial_rmses = np.asarray(trials.losses(), dtype=float)
+        best_ind = np.argmin(trial_rmses)
+        best_rmse_mean = trial_rmses[best_ind]
+        best_rmse_std = trials.trial_attachments(trials.trials[best_ind])["std"]
+        self.logger.info("-"*50)
+        self.logger.info("Best RMSE")
+        self.logger.info("      Mean: %.6f"%best_rmse_mean)
+        self.logger.info("      std: %.6f"%best_rmse_std)
+        self.logger.info("Best param")
+        self.task._print_param_dict(best_params)
+        end = time.time()
+        _sec = end - start
+        _min = int(_sec/60.)
+        self.logger.info("Time")
+        if _min > 0:
+            self.logger.info("      %d mins"%_min)
+        else:
+            self.logger.info("      %d secs"%_sec)
+        self.logger.info("-"*50)
+
+
+#------------------------ Main -------------------------
+def main(options):
+    logname = "[Feat@%s]_[Learner@%s]_hyperopt_%s.log"%(
+        options.feature_name, options.learner_name, time_utils._timestamp())
+    logger = logging_utils._get_logger(config.LOG_DIR, logname)
+    optimizer = TaskOptimizer(options.task_mode, options.learner_name, 
+        options.feature_name, logger, options.max_evals, verbose=True, 
+        refit_once=options.refit_once, plot_importance=options.plot_importance)
+    optimizer.run()
+
+def parse_args(parser):
+    parser.add_option("-m", "--mode", type="string", dest="task_mode",
+        help="task mode", default="single")
+    parser.add_option("-f", "--feat", type="string", dest="feature_name",
+        help="feature name", default="basic")
+    parser.add_option("-l", "--learner", type="string", dest="learner_name", 
+        help="learner name", default="reg_skl_ridge")
+    parser.add_option("-e", "--eval", type="int", dest="max_evals", 
+        help="maximun number of evals for hyperopt", default=100)
+    parser.add_option("-o", default=False, action="store_true", dest="refit_once",
+        help="stacking refit_once")
+    parser.add_option("-p", default=False, action="store_true", dest="plot_importance",
+        help="plot feautre importance (currently only for xgboost)")
+
+    (options, args) = parser.parse_args()
+    return options, args
+
+
+if __name__ == "__main__":
+
+    parser = OptionParser()
+    options, args = parse_args(parser)
+    main(options)
