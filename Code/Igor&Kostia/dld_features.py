@@ -208,4 +208,28 @@ for i in range(0,5):
     
     t0 = time()
     df_all['1word_string_dld_in_'+(first_list[i])] = df_all['product_info'].map(lambda x:str_common_word_string_only_dld(x.split('\t')[0],x.split('\t')[first_num[i]]))
-    df_all['1word_string_dld_in_'+(second_list[i])] = df_all['product_inf
+    df_all['1word_string_dld_in_'+(second_list[i])] = df_all['product_info'].map(lambda x:str_common_word_string_only_dld(x.split('\t')[1],x.split('\t')[second_num[i]]))
+    print '1word_string_dld time:',round(time()-t0,3) ,'s\n'
+
+    t0 = time()
+    df_all['2word_dld_in_'+(first_list[i])] = df_all['product_info'].map(lambda x:str_2common_words_dld(x.split('\t')[0],x.split('\t')[first_num[i]]))
+    df_all['2word_dld_in_'+(second_list[i])] = df_all['product_info'].map(lambda x:str_2common_words_dld(x.split('\t')[1],x.split('\t')[second_num[i]]))
+    print '2word_dld time:',round(time()-t0,3) ,'s\n'
+
+    t0 = time()
+    df_all['2word_string_dld_in_'+(first_list[i])] = df_all['product_info'].map(lambda x:str_2common_words_string_only_dld(x.split('\t')[0],x.split('\t')[first_num[i]]))
+    df_all['2word_string_dld_in_'+(second_list[i])] = df_all['product_info'].map(lambda x:str_2common_words_string_only_dld(x.split('\t')[1],x.split('\t')[second_num[i]]))
+    print '2word_string_dld time:',round(time()-t0,3) ,'s\n'    
+
+
+#save result
+st_names=list(df_all.keys()[len_of_features:])
+st_names.append("id")
+b=df_all[st_names]
+b.to_csv(FEATURES_DIR+"/dld_features.csv", index=False)
+
+
+
+
+
+
