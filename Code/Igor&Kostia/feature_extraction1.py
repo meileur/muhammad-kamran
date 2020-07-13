@@ -306,4 +306,130 @@ df_all['query_brand_in_brand_tuple']=df_all['brands_all'].map(lambda x: query_br
 df_all['query_brand_in_brand_fullmatch']=df_all['query_brand_in_brand_tuple'].map(lambda x: x[0])
 df_all['query_brand_in_brand_partialmatch']=df_all['query_brand_in_brand_tuple'].map(lambda x: x[1])
 df_all['query_brand_in_brand_assumedmatch']=df_all['query_brand_in_brand_tuple'].map(lambda x: x[2])
-df_all['query_brand_in_brand_nomatch']=df_all['query_brand
+df_all['query_brand_in_brand_nomatch']=df_all['query_brand_in_brand_tuple'].map(lambda x: x[3])
+df_all['query_brand_in_brand_convoluted']=df_all['query_brand_in_brand_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['query_brand_in_brand_tuple'],axis=1)
+
+df_all['query_brand_in_all_tuple']=df_all['brands_all'].map(lambda x: query_brand_material_in_attribute(x.split("\t")[0],";".join(x.split("\t")[1:])))
+df_all['query_brand_in_all_fullmatch']=df_all['query_brand_in_all_tuple'].map(lambda x: x[0])
+df_all['query_brand_in_all_partialmatch']=df_all['query_brand_in_all_tuple'].map(lambda x: x[1])
+df_all['query_brand_in_all_assumedmatch']=df_all['query_brand_in_all_tuple'].map(lambda x: x[2])
+df_all['query_brand_in_all_nomatch']=df_all['query_brand_in_all_tuple'].map(lambda x: x[3])
+df_all['query_brand_in_all_convoluted']=df_all['query_brand_in_all_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['query_brand_in_all_tuple'],axis=1)
+
+df_all['query_brand_in_title_tuple']=df_all['brands_all'].map(lambda x: query_brand_material_in_attribute(x.split("\t")[0],x.split("\t")[1]))
+df_all['query_brand_in_title_fullmatch']=df_all['query_brand_in_title_tuple'].map(lambda x: x[0])
+df_all['query_brand_in_title_partialmatch']=df_all['query_brand_in_title_tuple'].map(lambda x: x[1])
+df_all['query_brand_in_title_assumedmatch']=df_all['query_brand_in_title_tuple'].map(lambda x: x[2])
+df_all['query_brand_in_title_nomatch']=df_all['query_brand_in_title_tuple'].map(lambda x: x[3])
+df_all['query_brand_in_title_convoluted']=df_all['query_brand_in_title_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['query_brand_in_title_tuple'],axis=1)
+
+df_all['query_brand_in_description_tuple']=df_all['brands_all'].map(lambda x: query_brand_material_in_attribute(x.split("\t")[0],x.split("\t")[2]))
+df_all['query_brand_in_description_convoluted']=df_all['query_brand_in_description_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['query_brand_in_description_tuple'],axis=1)
+
+df_all['query_brand_in_bullets_tuple']=df_all['brands_all'].map(lambda x: query_brand_material_in_attribute(x.split("\t")[0],x.split("\t")[3]))
+df_all['query_brand_in_bullets_convoluted']=df_all['query_brand_in_bullets_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['query_brand_in_bullets_tuple'],axis=1)
+
+df_all=df_all.drop(['brands_all'],axis=1)
+
+print 'create brand match variables time:',round((time()-t0)/60,1) ,'minutes\n'
+t0 = time()
+
+
+
+########################################
+
+df_all['materials_all']=df_all['materials_in_search_term']+"\t"+df_all['materials_in_product_title']+"\t"+df_all['materials_in_product_description']+"\t"\
++df_all['materials_in_attribute_bullets']+"\t"+df_all['material_parsed']
+
+df_all['query_material_in_material_tuple']=df_all['materials_all'].map(lambda x: query_brand_material_in_attribute(x.split("\t")[0],x.split("\t")[4]))
+df_all['query_material_in_material_fullmatch']=df_all['query_material_in_material_tuple'].map(lambda x: x[0])
+df_all['query_material_in_material_partialmatch']=df_all['query_material_in_material_tuple'].map(lambda x: x[1])
+df_all['query_material_in_material_assumedmatch']=df_all['query_material_in_material_tuple'].map(lambda x: x[2])
+df_all['query_material_in_material_nomatch']=df_all['query_material_in_material_tuple'].map(lambda x: x[3])
+df_all['query_material_in_material_convoluted']=df_all['query_material_in_material_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['query_material_in_material_tuple'],axis=1)
+
+df_all['query_material_in_all_tuple']=df_all['materials_all'].map(lambda x: query_brand_material_in_attribute(x.split("\t")[0],";".join(x.split("\t")[1:])))
+df_all['query_material_in_all_fullmatch']=df_all['query_material_in_all_tuple'].map(lambda x: x[0])
+df_all['query_material_in_all_partialmatch']=df_all['query_material_in_all_tuple'].map(lambda x: x[1])
+df_all['query_material_in_all_assumedmatch']=df_all['query_material_in_all_tuple'].map(lambda x: x[2])
+df_all['query_material_in_all_nomatch']=df_all['query_material_in_all_tuple'].map(lambda x: x[3])
+df_all['query_material_in_all_convoluted']=df_all['query_material_in_all_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['query_material_in_all_tuple'],axis=1)
+
+df_all['query_material_in_title_tuple']=df_all['materials_all'].map(lambda x: query_brand_material_in_attribute(x.split("\t")[0],x.split("\t")[1]))
+df_all['query_material_in_title_convoluted']=df_all['query_material_in_title_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['query_material_in_title_tuple'],axis=1)
+
+df_all['query_material_in_description_tuple']=df_all['materials_all'].map(lambda x: query_brand_material_in_attribute(x.split("\t")[0],x.split("\t")[2]))
+df_all['query_material_in_description_convoluted']=df_all['query_material_in_description_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['query_material_in_description_tuple'],axis=1)
+
+df_all['query_material_in_bullets_tuple']=df_all['materials_all'].map(lambda x: query_brand_material_in_attribute(x.split("\t")[0],x.split("\t")[3]))
+df_all['query_material_in_bullets_convoluted']=df_all['query_material_in_bullets_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['query_material_in_bullets_tuple'],axis=1)
+
+df_all=df_all.drop(['materials_all'],axis=1)
+
+print 'create material match variables time:',round((time()-t0)/60,1) ,'minutes\n'
+t0 = time()
+
+
+
+
+
+#################################################################
+### STEP 4: Count number of similar words/letters/bigrams etc
+#################################################################
+
+################################
+### query vs product title
+
+
+df_all['wordFor_in_title_string_only_tuple']=df_all.apply(lambda x: \
+            str_common_word(x['search_term_for_stemmed'],x['product_title_stemmed'],string_only=True),axis=1)
+df_all['wordFor_in_title_string_only_num'] = df_all['wordFor_in_title_string_only_tuple'].map(lambda x: x[0])
+df_all['wordFor_in_title_string_only_let'] = df_all['wordFor_in_title_string_only_tuple'].map(lambda x: x[2])
+df_all['wordFor_in_title_string_only_letratio'] = df_all['wordFor_in_title_string_only_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['wordFor_in_title_string_only_tuple'],axis=1)
+
+df_all['wordWith_in_title_string_only_tuple']=df_all.apply(lambda x: \
+            str_common_word(x['search_term_with_stemmed'],x['product_title_stemmed'],string_only=True),axis=1)
+df_all['wordWith_in_title_string_only_num'] = df_all['wordWith_in_title_string_only_tuple'].map(lambda x: x[0])
+df_all['wordWith_in_title_string_only_let'] = df_all['wordWith_in_title_string_only_tuple'].map(lambda x: x[2])
+df_all['wordWith_in_title_string_only_letratio'] = df_all['wordWith_in_title_string_only_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['wordWith_in_title_string_only_tuple'],axis=1)
+
+df_all['prtitleWithout_in_query_string_only_tuple']=df_all.apply(lambda x: \
+            str_common_word(x['product_title_without_stemmed'],x['search_term_stemmed'],string_only=True),axis=1)
+df_all['prtitleWithout_in_query_string_only_num'] = df_all['prtitleWithout_in_query_string_only_tuple'].map(lambda x: x[0])
+df_all['prtitleWithout_in_query_string_only_let'] = df_all['prtitleWithout_in_query_string_only_tuple'].map(lambda x: x[2])
+df_all['prtitleWithout_in_query_string_only_letratio'] = df_all['prtitleWithout_in_query_string_only_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['prtitleWithout_in_query_string_only_tuple'],axis=1)
+
+df_all['query_in_title']=df_all.apply(lambda x: \
+            query_in_text(x['search_term_stemmed'],x['product_title_stemmed']),axis=1)
+
+df_all['word_in_title_tuple']=df_all.apply(lambda x: \
+            str_common_word(x['search_term_stemmed'],x['product_title_stemmed']),axis=1)
+df_all['word_in_title_num'] = df_all['word_in_title_tuple'].map(lambda x: x[0])
+df_all['word_in_title_sum'] = df_all['word_in_title_tuple'].map(lambda x: x[1])
+df_all['word_in_title_let'] = df_all['word_in_title_tuple'].map(lambda x: x[2])
+df_all['word_in_title_numratio'] = df_all['word_in_title_tuple'].map(lambda x: x[3])
+df_all['word_in_title_letratio'] = df_all['word_in_title_tuple'].map(lambda x: x[4])
+df_all['word_in_title_string'] = df_all['word_in_title_tuple'].map(lambda x: x[5])
+df_all=df_all.drop(['word_in_title_tuple'],axis=1)
+
+df_all['word_in_title_string_only_tuple']=df_all.apply(lambda x: \
+            str_common_word(x['search_term_stemmed'],x['product_title_stemmed'],string_only=True),axis=1)
+df_all['word_in_title_string_only_num'] = df_all['word_in_title_string_only_tuple'].map(lambda x: x[0])
+df_all['word_in_title_string_only_sum'] = df_all['word_in_title_string_only_tuple'].map(lambda x: x[1])
+df_all['word_in_title_string_only_let'] = df_all['word_in_title_string_only_tuple'].map(lambda x: x[2])
+df_all['word_in_title_string_only_numratio'] = df_all['word_in_title_string_only_tuple'].map(lambda x: x[3])
+df_all['word_in_title_string_only_letratio'] = df_all['word_in_title_string_only_tuple'].map(lambda x: x[4])
+df_a
