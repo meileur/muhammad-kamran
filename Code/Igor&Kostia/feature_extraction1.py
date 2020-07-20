@@ -432,4 +432,122 @@ df_all['word_in_title_string_only_sum'] = df_all['word_in_title_string_only_tupl
 df_all['word_in_title_string_only_let'] = df_all['word_in_title_string_only_tuple'].map(lambda x: x[2])
 df_all['word_in_title_string_only_numratio'] = df_all['word_in_title_string_only_tuple'].map(lambda x: x[3])
 df_all['word_in_title_string_only_letratio'] = df_all['word_in_title_string_only_tuple'].map(lambda x: x[4])
+df_all['word_in_title_string_only_string'] = df_all['word_in_title_string_only_tuple'].map(lambda x: x[5])
+df_all=df_all.drop(['word_in_title_string_only_tuple'],axis=1)
+
+df_all['word_in_title_w_dash']=df_all.apply(lambda x: \
+            str_common_word(words_w_dash(x['search_term_stemmed']),words_w_dash(x['product_title_stemmed']))[0],axis=1)
+
+df_all['two_words_in_title_tuple']=df_all.apply(lambda x: \
+            str_2common_words(x['search_term_stemmed'],x['product_title_stemmed']),axis=1)
+df_all['two_words_in_title_num'] = df_all['two_words_in_title_tuple'].map(lambda x: x[0])
+df_all['two_words_in_title_sum'] = df_all['two_words_in_title_tuple'].map(lambda x: x[1])
+df_all['two_words_in_title_let'] = df_all['two_words_in_title_tuple'].map(lambda x: x[2])
+df_all=df_all.drop(['two_words_in_title_tuple'],axis=1)
+
+df_all['two_words_in_title_string_only_tuple']=df_all.apply(lambda x: \
+            str_2common_words(x['search_term_stemmed'],x['product_title_stemmed'],string_only=True),axis=1)
+df_all['two_words_in_title_string_only_num'] = df_all['two_words_in_title_string_only_tuple'].map(lambda x: x[0])
+df_all['two_words_in_title_string_only_sum'] = df_all['two_words_in_title_string_only_tuple'].map(lambda x: x[1])
+df_all['two_words_in_title_string_only_let'] = df_all['two_words_in_title_string_only_tuple'].map(lambda x: x[2])
+df_all=df_all.drop(['two_words_in_title_string_only_tuple'],axis=1)
+
+df_all['common_digits_in_title_tuple']=df_all.apply(lambda x: \
+            str_common_digits(x['search_term_stemmed'],x['product_title_stemmed']),axis=1)
+df_all['len_of_digits_in_query'] = df_all['common_digits_in_title_tuple'].map(lambda x: x[0])
+df_all['len_of_digits_in_title'] = df_all['common_digits_in_title_tuple'].map(lambda x: x[1])
+df_all['common_digits_in_title_num'] = df_all['common_digits_in_title_tuple'].map(lambda x: x[2])
+df_all['common_digits_in_title_ratio'] = df_all['common_digits_in_title_tuple'].map(lambda x: x[3])
+df_all['common_digits_in_title_jaccard'] = df_all['common_digits_in_title_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['common_digits_in_title_tuple'],axis=1)
+
+df_all['nn_important_in_title_tuple']=df_all.apply(lambda x: \
+            str_common_word(str_stemmer_wo_parser(nn_important_words(x['search_term_tokens']),stoplist=stoplist_wo_can),\
+                            x['product_title_stemmed']),axis=1)
+df_all['nn_important_in_title_num'] = df_all['nn_important_in_title_tuple'].map(lambda x: x[0])
+df_all['nn_important_in_title_sum'] = df_all['nn_important_in_title_tuple'].map(lambda x: x[1])
+df_all['nn_important_in_title_let'] = df_all['nn_important_in_title_tuple'].map(lambda x: x[2])
+df_all['nn_important_in_title_numratio'] = df_all['nn_important_in_title_tuple'].map(lambda x: x[3])
+df_all['nn_important_in_title_letratio'] = df_all['nn_important_in_title_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['nn_important_in_title_tuple'],axis=1)
+
+df_all['nn_unimportant_in_title_tuple']=df_all.apply(lambda x: \
+            str_common_word(str_stemmer_wo_parser(nn_unimportant_words(x['search_term_tokens']),stoplist=stoplist_wo_can),\
+                            x['product_title_stemmed']),axis=1)
+df_all['nn_unimportant_in_title_num'] = df_all['nn_unimportant_in_title_tuple'].map(lambda x: x[0])
+df_all['nn_unimportant_in_title_let'] = df_all['nn_unimportant_in_title_tuple'].map(lambda x: x[2])
+df_all['nn_unimportant_in_title_letratio'] = df_all['nn_unimportant_in_title_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['nn_unimportant_in_title_tuple'],axis=1)
+
+"""
+df_all['vbg_in_title_tuple']=df_all.apply(lambda x: \
+            str_common_word(str_stemmer_wo_parser(vbg_words(x['search_term_tokens']),stoplist=stoplist_wo_can),\
+                            x['product_title_stemmed']),axis=1)
+df_all['vbg_in_title_num'] = df_all['vbg_in_title_tuple'].map(lambda x: x[0])
+df_all['vbg_in_title_sum'] = df_all['vbg_in_title_tuple'].map(lambda x: x[1])
+df_all['vbg_in_title_let'] = df_all['vbg_in_title_tuple'].map(lambda x: x[2])
+df_all=df_all.drop(['vbg_in_title_tuple'],axis=1)
+
+df_all['jj_rb_in_title_tuple']=df_all.apply(lambda x: \
+            str_common_word(str_stemmer_wo_parser(jj_rb_words(x['search_term_tokens']),stoplist=stoplist_wo_can),\
+                            x['product_title_stemmed']),axis=1)
+df_all['jj_rb_in_title_num'] = df_all['jj_rb_in_title_tuple'].map(lambda x: x[0])
+df_all['jj_rb_in_title_sum'] = df_all['jj_rb_in_title_tuple'].map(lambda x: x[1])
+df_all['jj_rb_in_title_let'] = df_all['jj_rb_in_title_tuple'].map(lambda x: x[2])
+df_all=df_all.drop(['jj_rb_in_title_tuple'],axis=1)
+"""
+
+df_all['nn_important_in_nn_important_in_title_tuple']=df_all.apply(lambda x: \
+            str_common_word(str_stemmer_wo_parser(nn_important_words(x['search_term_tokens']),stoplist=stoplist_wo_can),\
+                            str_stemmer_wo_parser(nn_important_words(x['product_title_tokens']),stoplist=stoplist_wo_can)),axis=1)
+df_all['nn_important_in_nn_important_in_title_num'] = df_all['nn_important_in_nn_important_in_title_tuple'].map(lambda x: x[0])
+df_all['nn_important_in_nn_important_in_title_sum'] = df_all['nn_important_in_nn_important_in_title_tuple'].map(lambda x: x[1])
+df_all['nn_important_in_nn_important_in_title_let'] = df_all['nn_important_in_nn_important_in_title_tuple'].map(lambda x: x[2])
+df_all['nn_important_in_nn_important_in_title_letratio'] = df_all['nn_important_in_nn_important_in_title_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['nn_important_in_nn_important_in_title_tuple'],axis=1)
+
+df_all['nn_important_in_nn_unimportant_in_title_tuple']=df_all.apply(lambda x: \
+            str_common_word(str_stemmer_wo_parser(nn_important_words(x['search_term_tokens']),stoplist=stoplist_wo_can),\
+                            str_stemmer_wo_parser(nn_unimportant_words(x['product_title_tokens']),stoplist=stoplist_wo_can)),axis=1)
+df_all['nn_important_in_nn_unimportant_in_title_num'] = df_all['nn_important_in_nn_unimportant_in_title_tuple'].map(lambda x: x[0])
+df_all['nn_important_in_nn_unimportant_in_title_sum'] = df_all['nn_important_in_nn_unimportant_in_title_tuple'].map(lambda x: x[1])
+df_all['nn_important_in_nn_unimportant_in_title_let'] = df_all['nn_important_in_nn_unimportant_in_title_tuple'].map(lambda x: x[2])
+df_all['nn_important_in_nn_unimportant_in_title_letratio'] = df_all['nn_important_in_nn_unimportant_in_title_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['nn_important_in_nn_unimportant_in_title_tuple'],axis=1)
+
+df_all['nn_unimportant_in_nn_important_in_title_tuple']=df_all.apply(lambda x: \
+            str_common_word(str_stemmer_wo_parser(nn_unimportant_words(x['search_term_tokens']),stoplist=stoplist_wo_can),\
+                            str_stemmer_wo_parser(nn_important_words(x['product_title_tokens']),stoplist=stoplist_wo_can)),axis=1)
+df_all['nn_unimportant_in_nn_important_in_title_num'] = df_all['nn_unimportant_in_nn_important_in_title_tuple'].map(lambda x: x[0])
+df_all['nn_unimportant_in_nn_important_in_title_sum'] = df_all['nn_unimportant_in_nn_important_in_title_tuple'].map(lambda x: x[1])
+df_all['nn_unimportant_in_nn_important_in_title_let'] = df_all['nn_unimportant_in_nn_important_in_title_tuple'].map(lambda x: x[2])
+df_all['nn_unimportant_in_nn_important_in_title_letratio'] = df_all['nn_unimportant_in_nn_important_in_title_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['nn_unimportant_in_nn_important_in_title_tuple'],axis=1)
+
+df_all['jj_rb_in_jj_rb_in_title_tuple']=df_all.apply(lambda x: \
+            str_common_word(str_stemmer_wo_parser(jj_rb_words(x['search_term_tokens']),stoplist=stoplist_wo_can),\
+                            str_stemmer_wo_parser(jj_rb_words(x['product_title_tokens']),stoplist=stoplist_wo_can)),axis=1)
+df_all['jj_rb_in_jj_rb_in_title_num'] = df_all['jj_rb_in_jj_rb_in_title_tuple'].map(lambda x: x[0])
+df_all['jj_rb_in_jj_rb_in_title_sum'] = df_all['jj_rb_in_jj_rb_in_title_tuple'].map(lambda x: x[1])
+df_all['jj_rb_in_jj_rb_in_title_let'] = df_all['jj_rb_in_jj_rb_in_title_tuple'].map(lambda x: x[2])
+df_all=df_all.drop(['jj_rb_in_jj_rb_in_title_tuple'],axis=1)
+
+df_all['vbg_in_vbg_in_title_tuple']=df_all.apply(lambda x: \
+            str_common_word(str_stemmer_wo_parser(vbg_words(x['search_term_tokens']),stoplist=stoplist_wo_can),\
+                            str_stemmer_wo_parser(vbg_words(x['product_title_tokens']),stoplist=stoplist_wo_can)),axis=1)
+df_all['vbg_in_vbg_in_title_num'] = df_all['vbg_in_vbg_in_title_tuple'].map(lambda x: x[0])
+df_all['vbg_in_vbg_in_title_sum'] = df_all['vbg_in_vbg_in_title_tuple'].map(lambda x: x[1])
+df_all['vbg_in_vbg_in_title_let'] = df_all['vbg_in_vbg_in_title_tuple'].map(lambda x: x[2])
+df_all=df_all.drop(['vbg_in_vbg_in_title_tuple'],axis=1)
+print 'words_in_title time:',round((time()-t0)/60,1) ,'minutes\n'
+t0 = time()
+
+
+###################################
+###################################
+
+################################
+### query vs product description
+
+
 df_a
