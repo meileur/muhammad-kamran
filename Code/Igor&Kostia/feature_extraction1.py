@@ -764,4 +764,145 @@ df_all['nn_unimportant_in_bullets_tuple']=df_all.apply(lambda x: \
             str_common_word(str_stemmer_wo_parser(nn_unimportant_words(x['search_term_tokens']),stoplist=stoplist_wo_can),\
                             x['attribute_bullets_stemmed']),axis=1)
 df_all['nn_unimportant_in_bullets_num'] = df_all['nn_unimportant_in_bullets_tuple'].map(lambda x: x[0])
-df_all['nn_unimportant_in_bullets_let'] = df_all['nn_unimport
+df_all['nn_unimportant_in_bullets_let'] = df_all['nn_unimportant_in_bullets_tuple'].map(lambda x: x[2])
+df_all['nn_unimportant_in_bullets_letratio'] = df_all['nn_unimportant_in_bullets_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['nn_unimportant_in_bullets_tuple'],axis=1)
+
+
+df_all['nn_important_in_nn_important_in_bullets_tuple']=df_all.apply(lambda x: \
+            str_common_word(str_stemmer_wo_parser(nn_important_words(x['search_term_tokens']),stoplist=stoplist_wo_can),\
+                            str_stemmer_wo_parser(nn_important_words(x['attribute_bullets_tokens']))),axis=1)
+df_all['nn_important_in_nn_important_in_bullets_num'] = df_all['nn_important_in_nn_important_in_bullets_tuple'].map(lambda x: x[0])
+df_all['nn_important_in_nn_important_in_bullets_sum'] = df_all['nn_important_in_nn_important_in_bullets_tuple'].map(lambda x: x[1])
+df_all['nn_important_in_nn_important_in_bullets_let'] = df_all['nn_important_in_nn_important_in_bullets_tuple'].map(lambda x: x[2])
+df_all['nn_important_in_nn_important_in_bullets_letratio'] = df_all['nn_important_in_nn_important_in_bullets_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['nn_important_in_nn_important_in_bullets_tuple'],axis=1)
+
+df_all['nn_important_in_nn_unimportant_in_bullets_tuple']=df_all.apply(lambda x: \
+            str_common_word(str_stemmer_wo_parser(nn_important_words(x['search_term_tokens']),stoplist=stoplist_wo_can),\
+                            str_stemmer_wo_parser(nn_unimportant_words(x['attribute_bullets_tokens']))),axis=1)
+df_all['nn_important_in_nn_unimportant_in_bullets_num'] = df_all['nn_important_in_nn_unimportant_in_bullets_tuple'].map(lambda x: x[0])
+df_all['nn_important_in_nn_unimportant_in_bullets_sum'] = df_all['nn_important_in_nn_unimportant_in_bullets_tuple'].map(lambda x: x[1])
+df_all['nn_important_in_nn_unimportant_in_bullets_let'] = df_all['nn_important_in_nn_unimportant_in_bullets_tuple'].map(lambda x: x[2])
+df_all['nn_important_in_nn_unimportant_in_bullets_letratio'] = df_all['nn_important_in_nn_unimportant_in_bullets_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['nn_important_in_nn_unimportant_in_bullets_tuple'],axis=1)
+
+df_all['nn_unimportant_in_nn_important_in_bullets_tuple']=df_all.apply(lambda x: \
+            str_common_word(str_stemmer_wo_parser(nn_unimportant_words(x['search_term_tokens']),stoplist=stoplist_wo_can),\
+                            str_stemmer_wo_parser(nn_important_words(x['attribute_bullets_tokens']))),axis=1)
+df_all['nn_unimportant_in_nn_important_in_bullets_num'] = df_all['nn_unimportant_in_nn_important_in_bullets_tuple'].map(lambda x: x[0])
+df_all['nn_unimportant_in_nn_important_in_bullets_sum'] = df_all['nn_unimportant_in_nn_important_in_bullets_tuple'].map(lambda x: x[1])
+df_all['nn_unimportant_in_nn_important_in_bullets_let'] = df_all['nn_unimportant_in_nn_important_in_bullets_tuple'].map(lambda x: x[2])
+df_all['nn_unimportant_in_nn_important_in_bullets_letratio'] = df_all['nn_unimportant_in_nn_important_in_bullets_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['nn_unimportant_in_nn_important_in_bullets_tuple'],axis=1)
+
+df_all['jj_rb_in_jj_rb_in_bullets_tuple']=df_all.apply(lambda x: \
+            str_common_word(str_stemmer_wo_parser(jj_rb_words(x['search_term_tokens']),stoplist=stoplist_wo_can),\
+                            str_stemmer_wo_parser(jj_rb_words(x['attribute_bullets_tokens']))),axis=1)
+df_all['jj_rb_in_jj_rb_in_bullets_num'] = df_all['jj_rb_in_jj_rb_in_bullets_tuple'].map(lambda x: x[0])
+df_all['jj_rb_in_jj_rb_in_bullets_sum'] = df_all['jj_rb_in_jj_rb_in_bullets_tuple'].map(lambda x: x[1])
+df_all['jj_rb_in_jj_rb_in_bullets_let'] = df_all['jj_rb_in_jj_rb_in_bullets_tuple'].map(lambda x: x[2])
+df_all=df_all.drop(['jj_rb_in_jj_rb_in_bullets_tuple'],axis=1)
+
+df_all['vbg_in_vbg_in_bullets_tuple']=df_all.apply(lambda x: \
+            str_common_word(str_stemmer_wo_parser(vbg_words(x['search_term_tokens']),stoplist=stoplist_wo_can),\
+                            str_stemmer_wo_parser(vbg_words(x['attribute_bullets_tokens']))),axis=1)
+df_all['vbg_in_vbg_in_bullets_num'] = df_all['vbg_in_vbg_in_bullets_tuple'].map(lambda x: x[0])
+df_all['vbg_in_vbg_in_bullets_sum'] = df_all['vbg_in_vbg_in_bullets_tuple'].map(lambda x: x[1])
+df_all['vbg_in_vbg_in_bullets_let'] = df_all['vbg_in_vbg_in_bullets_tuple'].map(lambda x: x[2])
+df_all=df_all.drop(['vbg_in_vbg_in_bullets_tuple'],axis=1)
+print 'words_in_bullets time:',round((time()-t0)/60,1) ,'minutes\n'
+t0 = time()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#################################################################
+### STEP 5: Process the most important words (keywords)
+#################################################################
+
+
+
+############################################################
+### count common words/letters and jaccard coefficients
+
+
+t0 = time()
+
+df_all['keyword_in_titlekeys_tuple']=df_all.apply(lambda x: \
+            str_common_word(x['search_term_keys_stemmed'],x['product_title_keys_stemmed']),axis=1)
+df_all['keyword_in_titlekeys_num'] = df_all['keyword_in_titlekeys_tuple'].map(lambda x: x[0])
+df_all['keyword_in_titlekeys_sum'] = df_all['keyword_in_titlekeys_tuple'].map(lambda x: x[1])
+df_all['keyword_in_titlekeys_let'] = df_all['keyword_in_titlekeys_tuple'].map(lambda x: x[2])
+df_all['keyword_in_titlekeys_numratio'] = df_all['keyword_in_titlekeys_tuple'].map(lambda x: x[3])
+df_all['keyword_in_titlekeys_letratio'] = df_all['keyword_in_titlekeys_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['keyword_in_titlekeys_tuple'],axis=1)
+
+df_all['keyword_in_description_tuple']=df_all.apply(lambda x: \
+            str_common_word(x['search_term_keys_stemmed'],x['product_description_stemmed']),axis=1)
+df_all['keyword_in_description_num'] = df_all['keyword_in_description_tuple'].map(lambda x: x[0])
+df_all['keyword_in_description_sum'] = df_all['keyword_in_description_tuple'].map(lambda x: x[1])
+df_all['keyword_in_description_let'] = df_all['keyword_in_description_tuple'].map(lambda x: x[2])
+df_all['keyword_in_description_numratio'] = df_all['keyword_in_description_tuple'].map(lambda x: x[3])
+df_all['keyword_in_description_letratio'] = df_all['keyword_in_description_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['keyword_in_description_tuple'],axis=1)
+
+df_all['keyword_in_bullets_tuple']=df_all.apply(lambda x: \
+            str_common_word(x['search_term_keys_stemmed'],x['attribute_bullets_stemmed']),axis=1)
+df_all['keyword_in_bullets_num'] = df_all['keyword_in_bullets_tuple'].map(lambda x: x[0])
+df_all['keyword_in_bullets_sum'] = df_all['keyword_in_bullets_tuple'].map(lambda x: x[1])
+df_all['keyword_in_bullets_let'] = df_all['keyword_in_bullets_tuple'].map(lambda x: x[2])
+df_all['keyword_in_bullets_numratio'] = df_all['keyword_in_bullets_tuple'].map(lambda x: x[3])
+df_all['keyword_in_bullets_letratio'] = df_all['keyword_in_bullets_tuple'].map(lambda x: x[4])
+df_all=df_all.drop(['keyword_in_bullets_tuple'],axis=1)
+
+
+df_all['jaccard_keyword_in_titlekeys_tuple']=df_all.apply(lambda x: \
+            str_jaccard(x['search_term_keys_stemmed'],x['product_title_keys_stemmed']),axis=1)
+df_all['keyword_in_titlekeys_jacnum'] = df_all['jaccard_keyword_in_titlekeys_tuple'].map(lambda x: x[0])
+df_all['keyword_in_titlekeys_jaclet'] = df_all['jaccard_keyword_in_titlekeys_tuple'].map(lambda x: x[1])
+df_all=df_all.drop(['jaccard_keyword_in_titlekeys_tuple'],axis=1)
+
+
+
+
+def concatenate_keys(beforethekey,thekey):
+    l=[beforethekey,thekey]
+    if "" in l:
+        l.remove("")
+    if "" in l:
+        l.remove("")
+    return " ".join(l)
+
+df_all['thekeys_in_title']=df_all.apply(lambda x: \
+            query_in_text(concatenate_keys(x['search_term_beforethekey_stemmed'],x['search_term_thekey_stemmed']),\
+                          x['product_title_stemmed']), axis=1)  
+df_all['thekeys_in_description']=df_all.apply(lambda x: \
+            query_in_text(concatenate_keys(x['search_term_beforethekey_stemmed'],x['search_term_thekey_stemmed']),\
+                          x['product_description_stemmed']), axis=1)  
+df_all['thekeys_in_bullets']=df_all.apply(lambda x: \
+            query_in_text(concatenate_keys(x['search_term_beforethekey_stemmed'],x['search_term_thekey_stemmed']),\
+                          x['attribute_bullets_stemmed']), axis=1)                            
+
+df_all['thekey_in_description_tuple']=df_all.apply(lambda x: \
+            str_common_word(x['search_term_thekey_stemmed'],x['product_description_stemmed']), axis=1) 
+df_all['thekey_in_description_sum'] = df_all['thekey_in_description_tuple'].map(lambda x: x[1])
+df_all['thekey_in_description_let'] = df_all['thekey_in_description_tuple'].map(lambda x: x[2])
+df_all=df_all.drop(['thekey_in_description_tuple'],axis=1)
+
+df_all['thekey_in_bullets_tuple']=df_all.apply(lambda x: \
+            str_common_word(x['search_term_thekey_stemmed'],x['attribute_bullets_stemmed']), axis=1) 
+df_all['thekey_in_bullet
