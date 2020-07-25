@@ -905,4 +905,137 @@ df_all=df_all.drop(['thekey_in_description_tuple'],axis=1)
 
 df_all['thekey_in_bullets_tuple']=df_all.apply(lambda x: \
             str_common_word(x['search_term_thekey_stemmed'],x['attribute_bullets_stemmed']), axis=1) 
-df_all['thekey_in_bullet
+df_all['thekey_in_bullets_sum'] = df_all['thekey_in_bullets_tuple'].map(lambda x: x[1])
+df_all['thekey_in_bullets_let'] = df_all['thekey_in_bullets_tuple'].map(lambda x: x[2])
+df_all=df_all.drop(['thekey_in_bullets_tuple'],axis=1)
+
+df_all['beforethekey_in_description_tuple']=df_all.apply(lambda x: \
+            str_common_word(x['search_term_beforethekey_stemmed'],x['product_description_stemmed']), axis=1) 
+df_all['beforethekey_in_description_sum'] = df_all['beforethekey_in_description_tuple'].map(lambda x: x[1])
+df_all['beforethekey_in_description_let'] = df_all['beforethekey_in_description_tuple'].map(lambda x: x[2])
+df_all=df_all.drop(['beforethekey_in_description_tuple'],axis=1)
+
+df_all['beforethekey_in_bullets_tuple']=df_all.apply(lambda x: \
+            str_common_word(x['search_term_beforethekey_stemmed'],x['attribute_bullets_stemmed']), axis=1) 
+df_all['beforethekey_in_bullets_sum'] = df_all['beforethekey_in_bullets_tuple'].map(lambda x: x[1])
+df_all['beforethekey_in_bullets_let'] = df_all['beforethekey_in_bullets_tuple'].map(lambda x: x[2])
+df_all=df_all.drop(['beforethekey_in_bullets_tuple'],axis=1)
+
+
+df_all['thekey_in_nn_important_in_description_tuple']=df_all.apply(lambda x: \
+            str_common_word(x['search_term_thekey_stemmed'],
+                            str_stemmer_wo_parser(nn_important_words(x['product_description_tokens']))),axis=1)
+df_all['thekey_in_nn_important_in_description_sum'] = df_all['thekey_in_nn_important_in_description_tuple'].map(lambda x: x[1])
+df_all['thekey_in_nn_important_in_description_let'] = df_all['thekey_in_nn_important_in_description_tuple'].map(lambda x: x[2])
+df_all=df_all.drop(['thekey_in_nn_important_in_description_tuple'],axis=1)
+
+df_all['thekey_in_nn_important_in_bullets_tuple']=df_all.apply(lambda x: \
+            str_common_word(x['search_term_thekey_stemmed'],
+                            str_stemmer_wo_parser(nn_important_words(x['attribute_bullets_tokens']))),axis=1)
+df_all['thekey_in_nn_important_in_bullets_sum'] = df_all['thekey_in_nn_important_in_bullets_tuple'].map(lambda x: x[1])
+df_all['thekey_in_nn_important_in_bullets_let'] = df_all['thekey_in_nn_important_in_bullets_tuple'].map(lambda x: x[2])
+df_all=df_all.drop(['thekey_in_nn_important_in_bullets_tuple'],axis=1)
+
+
+
+
+
+### find whether important words match
+def match_thekeywords(word1,word2):
+    return int(len(word1)>0 and len(word2)>0 and (word1 in word2 or word2 in word1))
+
+df_all['thekey_in_thekey']=df_all.apply(lambda x: \
+            match_thekeywords(x['search_term_thekey_stemmed'],x['product_title_thekey_stemmed']),axis=1)
+df_all['beforethekey_in_beforethekey']=df_all.apply(lambda x: \
+            match_thekeywords(x['search_term_beforethekey_stemmed'],x['product_title_beforethekey_stemmed']),axis=1) 
+df_all['beforethekeys_in_beforethekeys']=df_all.apply(lambda x: \
+            max(match_thekeywords(x['search_term_beforethekey_stemmed'],x['product_title_beforethekey_stemmed']),\
+                match_thekeywords(x['search_term_beforethekey_stemmed'],x['product_title_before2thekey_stemmed']),\
+                match_thekeywords(x['search_term_before2thekey_stemmed'],x['product_title_beforethekey_stemmed']),\
+                match_thekeywords(x['search_term_before2thekey_stemmed'],x['product_title_before2thekey_stemmed'])),axis=1)
+df_all['thekey_in_beforethekeys']=df_all.apply(lambda x: \
+            max(match_thekeywords(x['search_term_thekey_stemmed'],x['product_title_beforethekey_stemmed']),\
+                match_thekeywords(x['search_term_thekey_stemmed'],x['product_title_before2thekey_stemmed'])),axis=1)
+df_all['beforethekeys_in_thekey']=df_all.apply(lambda x: \
+            max(match_thekeywords(x['search_term_thekey_stemmed'],x['product_title_beforethekey_stemmed']),\
+                match_thekeywords(x['search_term_thekey_stemmed'],x['product_title_before2thekey_stemmed'])),axis=1)
+            
+
+
+#################################################################
+### Use NLTK WordNet to calculate similarities between keywords
+t2 = time()
+
+##############
+df_all['key_for_dict']=df_all.apply(lambda x: x['search_term_thekey']+"\t"+x['product_title_thekey'],axis=1) 
+aa=list(set(list(df_all['key_for_dict'])))
+my_dict={}
+for i in range(0,len(aa)):
+    my_dict[aa[i]]=find_similarity(aa[i].split("\t")[0],aa[i].split("\t")[1])
+    if (i % 5000)==0:
+        print ""+str(i)+" out of "+str(len(aa))+" unique combinations; "+str(round((time()-t2)/60,1))+" minutes"
+    
+df_all['thekeys_similarity_tuple']=df_all['key_for_dict'].map(lambda x: my_dict[x] )
+df_all['thekeys_pathsimilarity_max'] = df_all['thekeys_similarity_tuple'].map(lambda x: x[0])
+df_all['thekeys_pathsimilarity_mean'] = df_all['thekeys_similarity_tuple'].map(lambda x: x[1])
+df_all['thekeys_lchsimilarity_max'] = df_all['thekeys_similarity_tuple'].map(lambda x: x[2])
+df_all['thekeys_lchsimilarity_mean'] = df_all['thekeys_similarity_tuple'].map(lambda x: x[3])
+df_all['thekeys_ressimilarity_max'] = df_all['thekeys_similarity_tuple'].map(lambda x: x[4])
+df_all['thekeys_ressimilarity_mean'] = df_all['thekeys_similarity_tuple'].map(lambda x: x[5])
+df_all=df_all.drop(['thekeys_similarity_tuple'],axis=1)
+print 'thekeys similarity time:',round((time()-t2)/60,1) ,'minutes\n'
+t2 = time()
+
+##############
+df_all['key_for_dict']=df_all.apply(lambda x: x['search_term_beforethekey']+"\t"+x['product_title_beforethekey'],axis=1) 
+aa=list(set(list(df_all['key_for_dict'])))
+my_dict={}
+for i in range(0,len(aa)):
+    my_dict[aa[i]]=find_similarity(aa[i].split("\t")[0],aa[i].split("\t")[1],nouns=False)
+    if (i % 5000)==0:
+        print ""+str(i)+" out of "+str(len(aa))+" unique combinations; "+str(round((time()-t2)/60,1))+" minutes"
+    
+df_all['beforethekeys_similarity_tuple']=df_all['key_for_dict'].map(lambda x: my_dict[x] )
+df_all['beforethekeys_pathsimilarity_max'] = df_all['beforethekeys_similarity_tuple'].map(lambda x: x[0])
+df_all['beforethekeys_pathsimilarity_mean'] = df_all['beforethekeys_similarity_tuple'].map(lambda x: x[1])
+df_all['beforethekeys_lchsimilarity_max'] = df_all['beforethekeys_similarity_tuple'].map(lambda x: x[2])
+df_all['beforethekeys_lchsimilarity_mean'] = df_all['beforethekeys_similarity_tuple'].map(lambda x: x[3])
+df_all['beforethekeys_ressimilarity_max'] = df_all['beforethekeys_similarity_tuple'].map(lambda x: x[4])
+df_all['beforethekeys_ressimilarity_mean'] = df_all['beforethekeys_similarity_tuple'].map(lambda x: x[5])
+df_all=df_all.drop(['beforethekeys_similarity_tuple'],axis=1)
+print 'beforethekeys similarity time:',round((time()-t2)/60,1) ,'minutes\n'
+t2 = time()
+
+
+
+##############
+df_all['key_for_dict']=df_all.apply(lambda x: x['search_term_thekey']+"\t"+x['product_title_beforethekey'],axis=1) 
+aa=list(set(list(df_all['key_for_dict'])))
+my_dict={}
+for i in range(0,len(aa)):
+    my_dict[aa[i]]=find_similarity(aa[i].split("\t")[0],aa[i].split("\t")[1],nouns=False)
+    if (i % 5000)==0:
+        print ""+str(i)+" out of "+str(len(aa))+" unique combinations; "+str(round((time()-t2)/60,1))+" minutes"
+df_all['thekey_beforethekey_similarity_tuple']=df_all['key_for_dict'].map(lambda x: my_dict[x] )
+df_all['thekey_beforethekey_pathsimilarity_max'] = df_all['thekey_beforethekey_similarity_tuple'].map(lambda x: x[0])
+df_all['thekey_beforethekey_pathsimilarity_mean'] = df_all['thekey_beforethekey_similarity_tuple'].map(lambda x: x[1])
+df_all['thekey_beforethekey_lchsimilarity_max'] = df_all['thekey_beforethekey_similarity_tuple'].map(lambda x: x[2])
+df_all['thekey_beforethekey_lchsimilarity_mean'] = df_all['thekey_beforethekey_similarity_tuple'].map(lambda x: x[3])
+df_all['thekey_beforethekey_ressimilarity_max'] = df_all['thekey_beforethekey_similarity_tuple'].map(lambda x: x[4])
+df_all['thekey_beforethekey_ressimilarity_mean'] = df_all['thekey_beforethekey_similarity_tuple'].map(lambda x: x[5])
+df_all=df_all.drop(['thekey_beforethekey_similarity_tuple'],axis=1)
+print 'thekey_beforethekey similarity time:',round((time()-t2)/60,1) ,'minutes\n'
+t2 = time()
+
+
+df_all['key_for_dict']=df_all.apply(lambda x: x['search_term_thekey']+"\t"+x['product_title_before2thekey'],axis=1) 
+aa=list(set(list(df_all['key_for_dict'])))
+my_dict={}
+for i in range(0,len(aa)):
+    my_dict[aa[i]]=find_similarity(aa[i].split("\t")[0],aa[i].split("\t")[1],nouns=False)
+    if (i % 5000)==0:
+        print ""+str(i)+" out of "+str(len(aa))+" unique combinations; "+str(round((time()-t2)/60,1))+" minutes"
+df_all['thekey_before2thekey_similarity_tuple']=df_all['key_for_dict'].map(lambda x: my_dict[x] )
+df_all['thekey_before2thekey_pathsimilarity_max'] = df_all['thekey_before2thekey_similarity_tuple'].map(lambda x: x[0])
+df_all['thekey_before2thekey_pathsimilarity_mean'] = df_all['thekey_before2thekey_similarity_tuple'].map(lambda x: x[1])
+df_all['thekey_before2thekey_lchsimilarity_max'] = df_all['thekey_be
