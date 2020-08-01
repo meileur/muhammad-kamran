@@ -1038,4 +1038,138 @@ for i in range(0,len(aa)):
 df_all['thekey_before2thekey_similarity_tuple']=df_all['key_for_dict'].map(lambda x: my_dict[x] )
 df_all['thekey_before2thekey_pathsimilarity_max'] = df_all['thekey_before2thekey_similarity_tuple'].map(lambda x: x[0])
 df_all['thekey_before2thekey_pathsimilarity_mean'] = df_all['thekey_before2thekey_similarity_tuple'].map(lambda x: x[1])
-df_all['thekey_before2thekey_lchsimilarity_max'] = df_all['thekey_be
+df_all['thekey_before2thekey_lchsimilarity_max'] = df_all['thekey_before2thekey_similarity_tuple'].map(lambda x: x[2])
+df_all['thekey_before2thekey_lchsimilarity_mean'] = df_all['thekey_before2thekey_similarity_tuple'].map(lambda x: x[3])
+df_all['thekey_before2thekey_ressimilarity_max'] = df_all['thekey_before2thekey_similarity_tuple'].map(lambda x: x[4])
+df_all['thekey_before2thekey_ressimilarity_mean'] = df_all['thekey_before2thekey_similarity_tuple'].map(lambda x: x[5])
+df_all=df_all.drop(['thekey_before2thekey_similarity_tuple'],axis=1)
+print 'thekey_before2thekey similarity time:',round((time()-t2)/60,1) ,'minutes\n'
+t2 = time()
+
+for var_name in ['pathsimilarity_max','pathsimilarity_mean','lchsimilarity_max','lchsimilarity_mean',
+                 'ressimilarity_max', 'ressimilarity_mean']:
+    df_all['thekey_beforethekeys_'+var_name] = df_all.apply(lambda x: \
+        max(x['thekey_beforethekey_'+var_name], x['thekey_before2thekey_'+var_name]),axis=1)
+
+
+##############
+df_all['key_for_dict']=df_all.apply(lambda x: x['search_term_beforethekey']+"\t"+x['product_title_thekey'],axis=1) 
+aa=list(set(list(df_all['key_for_dict'])))
+my_dict={}
+for i in range(0,len(aa)):
+    my_dict[aa[i]]=find_similarity(aa[i].split("\t")[0],aa[i].split("\t")[1],nouns=False)
+    if (i % 5000)==0:
+        print ""+str(i)+" out of "+str(len(aa))+" unique combinations; "+str(round((time()-t2)/60,1))+" minutes"
+    
+df_all['beforethekey_thekey_similarity_tuple']=df_all['key_for_dict'].map(lambda x: my_dict[x] )
+df_all['beforethekey_thekey_pathsimilarity_max'] = df_all['beforethekey_thekey_similarity_tuple'].map(lambda x: x[0])
+df_all['beforethekey_thekey_pathsimilarity_mean'] = df_all['beforethekey_thekey_similarity_tuple'].map(lambda x: x[1])
+df_all['beforethekey_thekey_lchsimilarity_max'] = df_all['beforethekey_thekey_similarity_tuple'].map(lambda x: x[2])
+df_all['beforethekey_thekey_lchsimilarity_mean'] = df_all['beforethekey_thekey_similarity_tuple'].map(lambda x: x[3])
+df_all['beforethekey_thekey_ressimilarity_max'] = df_all['beforethekey_thekey_similarity_tuple'].map(lambda x: x[4])
+df_all['beforethekey_thekey_ressimilarity_mean'] = df_all['beforethekey_thekey_similarity_tuple'].map(lambda x: x[5])
+df_all=df_all.drop(['beforethekey_thekey_similarity_tuple'],axis=1)
+print 'beforethekey_thekey similarity time:',round((time()-t2)/60,1) ,'minutes\n'
+t2 = time()
+
+
+df_all['key_for_dict']=df_all.apply(lambda x: x['search_term_before2thekey']+"\t"+x['product_title_thekey'],axis=1) 
+aa=list(set(list(df_all['key_for_dict'])))
+my_dict={}
+for i in range(0,len(aa)):
+    my_dict[aa[i]]=find_similarity(aa[i].split("\t")[0],aa[i].split("\t")[1],nouns=False)
+    if (i % 5000)==0:
+        print ""+str(i)+" out of "+str(len(aa))+" unique combinations; "+str(round((time()-t2)/60,1))+" minutes"
+    
+df_all['before2thekey_thekey_similarity_tuple']=df_all['key_for_dict'].map(lambda x: my_dict[x] )
+df_all['before2thekey_thekey_pathsimilarity_max'] = df_all['before2thekey_thekey_similarity_tuple'].map(lambda x: x[0])
+df_all['before2thekey_thekey_pathsimilarity_mean'] = df_all['before2thekey_thekey_similarity_tuple'].map(lambda x: x[1])
+df_all['before2thekey_thekey_lchsimilarity_max'] = df_all['before2thekey_thekey_similarity_tuple'].map(lambda x: x[2])
+df_all['before2thekey_thekey_lchsimilarity_mean'] = df_all['before2thekey_thekey_similarity_tuple'].map(lambda x: x[3])
+df_all['before2thekey_thekey_ressimilarity_max'] = df_all['before2thekey_thekey_similarity_tuple'].map(lambda x: x[4])
+df_all['before2thekey_thekey_ressimilarity_mean'] = df_all['before2thekey_thekey_similarity_tuple'].map(lambda x: x[5])
+df_all=df_all.drop(['before2thekey_thekey_similarity_tuple'],axis=1)
+print 'before2thekey_thekey similarity time:',round((time()-t2)/60,1) ,'minutes\n'
+t2 = time()
+
+for var_name in ['pathsimilarity_max','pathsimilarity_mean','lchsimilarity_max','lchsimilarity_mean',
+                 'ressimilarity_max', 'ressimilarity_mean']:
+    df_all['beforethekeys_thekey_'+var_name] = df_all.apply(lambda x: \
+        max(x['beforethekey_thekey_'+var_name], x['before2thekey_thekey_'+var_name]),axis=1)
+
+
+##############
+df_all['key_for_dict']=df_all.apply(lambda x: x['search_term_thekey']+"\t"+x['search_term_beforethekey'],axis=1) 
+aa=list(set(list(df_all['key_for_dict'])))
+my_dict={}
+for i in range(0,len(aa)):
+    my_dict[aa[i]]=find_similarity(aa[i].split("\t")[0],aa[i].split("\t")[1],nouns=False)
+    if (i % 5000)==0:
+        print ""+str(i)+" out of "+str(len(aa))+" unique combinations; "+str(round((time()-t2)/60,1))+" minutes"
+    
+df_all['query_similarity_tuple']=df_all['key_for_dict'].map(lambda x: my_dict[x] )
+df_all['query_pathsimilarity_max'] = df_all['query_similarity_tuple'].map(lambda x: x[0])
+df_all['query_pathsimilarity_mean'] = df_all['query_similarity_tuple'].map(lambda x: x[1])
+df_all['query_lchhsimilarity_max'] = df_all['query_similarity_tuple'].map(lambda x: x[2])
+df_all['query_lchsimilarity_mean'] = df_all['query_similarity_tuple'].map(lambda x: x[3])
+df_all['query_ressimilarity_max'] = df_all['query_similarity_tuple'].map(lambda x: x[4])
+df_all['query_ressimilarity_mean'] = df_all['query_similarity_tuple'].map(lambda x: x[5])
+df_all=df_all.drop(['query_similarity_tuple'],axis=1)
+print 'query similarity time:',round((time()-t2)/60,1) ,'minutes\n'
+t2 = time()
+
+
+##############
+df_all['key_for_dict']=df_all.apply(lambda x: x['product_title_thekey']+"\t"+x['product_title_beforethekey'],axis=1) 
+aa=list(set(list(df_all['key_for_dict'])))
+my_dict={}
+for i in range(0,len(aa)):
+    my_dict[aa[i]]=find_similarity(aa[i].split("\t")[0],aa[i].split("\t")[1],nouns=False)
+    if (i % 5000)==0:
+        print ""+str(i)+" out of "+str(len(aa))+" unique combinations; "+str(round((time()-t2)/60,1))+" minutes"
+    
+df_all['title_similarity_tuple']=df_all['key_for_dict'].map(lambda x: my_dict[x] )
+df_all['title_pathsimilarity_max'] = df_all['title_similarity_tuple'].map(lambda x: x[0])
+df_all['title_pathsimilarity_mean'] = df_all['title_similarity_tuple'].map(lambda x: x[1])
+df_all['title_lchsimilarity_max'] = df_all['title_similarity_tuple'].map(lambda x: x[2])
+df_all['title_lchsimilarity_mean'] = df_all['title_similarity_tuple'].map(lambda x: x[3])
+df_all['title_ressimilarity_max'] = df_all['title_similarity_tuple'].map(lambda x: x[4])
+df_all['title_ressimilarity_mean'] = df_all['title_similarity_tuple'].map(lambda x: x[5])
+df_all=df_all.drop(['title_similarity_tuple'],axis=1)
+print 'title similarity time:',round((time()-t2)/60,1) ,'minutes\n'
+t2 = time()
+
+##############
+df_all['key_for_dict']=df_all.apply(lambda x: x['search_term_before2thekey']+"\t"+x['product_title_beforethekey'],axis=1) 
+aa=list(set(list(df_all['key_for_dict'])))
+my_dict={}
+for i in range(0,len(aa)):
+    my_dict[aa[i]]=find_similarity(aa[i].split("\t")[0],aa[i].split("\t")[1],nouns=False)
+    if (i % 5000)==0:
+        print ""+str(i)+" out of "+str(len(aa))+" unique combinations; "+str(round((time()-t2)/60,1))+" minutes"
+    
+df_all['before2thekey_beforethekey_similarity_tuple']=df_all['key_for_dict'].map(lambda x: my_dict[x] )
+df_all['before2thekey_beforethekey_pathsimilarity_max'] = df_all['before2thekey_beforethekey_similarity_tuple'].map(lambda x: x[0])
+df_all['before2thekey_beforethekey_pathsimilarity_mean'] = df_all['before2thekey_beforethekey_similarity_tuple'].map(lambda x: x[1])
+df_all['before2thekey_beforethekey_lchsimilarity_max'] = df_all['before2thekey_beforethekey_similarity_tuple'].map(lambda x: x[2])
+df_all['before2thekey_beforethekey_lchsimilarity_mean'] = df_all['before2thekey_beforethekey_similarity_tuple'].map(lambda x: x[3])
+df_all['before2thekey_beforethekey_ressimilarity_max'] = df_all['before2thekey_beforethekey_similarity_tuple'].map(lambda x: x[4])
+df_all['before2thekey_beforethekey_ressimilarity_mean'] = df_all['before2thekey_beforethekey_similarity_tuple'].map(lambda x: x[5])
+df_all=df_all.drop(['before2thekey_beforethekey_similarity_tuple'],axis=1)
+print 'before2thekey_beforethekey similarity time:',round((time()-t2)/60,1) ,'minutes\n'
+t2 = time()
+
+
+##############
+df_all['key_for_dict']=df_all.apply(lambda x: x['search_term_beforethekey']+"\t"+x['product_title_before2thekey'],axis=1) 
+aa=list(set(list(df_all['key_for_dict'])))
+my_dict={}
+for i in range(0,len(aa)):
+    my_dict[aa[i]]=find_similarity(aa[i].split("\t")[0],aa[i].split("\t")[1],nouns=False)
+    if (i % 5000)==0:
+        print ""+str(i)+" out of "+str(len(aa))+" unique combinations; "+str(round((time()-t2)/60,1))+" minutes"
+    
+df_all['beforethekey_before2thekey_similarity_tuple']=df_all['key_for_dict'].map(lambda x: my_dict[x] )
+df_all['beforethekey_before2thekey_pathsimilarity_max'] = df_all['beforethekey_before2thekey_similarity_tuple'].map(lambda x: x[0])
+df_all['beforethekey_before2thekey_pathsimilarity_mean'] = df_all['beforethekey_before2thekey_similarity_tuple'].map(lambda x: x[1])
+df_all['beforethekey_before2thekey_lchsimilarity_max'] = df_all['befor
