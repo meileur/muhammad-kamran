@@ -1172,4 +1172,143 @@ for i in range(0,len(aa)):
 df_all['beforethekey_before2thekey_similarity_tuple']=df_all['key_for_dict'].map(lambda x: my_dict[x] )
 df_all['beforethekey_before2thekey_pathsimilarity_max'] = df_all['beforethekey_before2thekey_similarity_tuple'].map(lambda x: x[0])
 df_all['beforethekey_before2thekey_pathsimilarity_mean'] = df_all['beforethekey_before2thekey_similarity_tuple'].map(lambda x: x[1])
-df_all['beforethekey_before2thekey_lchsimilarity_max'] = df_all['befor
+df_all['beforethekey_before2thekey_lchsimilarity_max'] = df_all['beforethekey_before2thekey_similarity_tuple'].map(lambda x: x[2])
+df_all['beforethekey_before2thekey_lchsimilarity_mean'] = df_all['beforethekey_before2thekey_similarity_tuple'].map(lambda x: x[3])
+df_all['beforethekey_before2thekey_ressimilarity_max'] = df_all['beforethekey_before2thekey_similarity_tuple'].map(lambda x: x[4])
+df_all['beforethekey_before2thekey_ressimilarity_mean'] = df_all['beforethekey_before2thekey_similarity_tuple'].map(lambda x: x[5])
+df_all=df_all.drop(['beforethekey_before2thekey_similarity_tuple'],axis=1)
+print 'beforethekey_before2thekey similarity time:',round((time()-t2)/60,1) ,'minutes\n'
+t2 = time()
+
+df_all=df_all.drop(['key_for_dict'],axis=1)
+
+print 'process key words time:',round((time()-t0)/60,1) ,'minutes\n'
+t0 = time()
+
+
+
+
+
+#################################################################
+### STEP 6: Estimate how similar strings in query and text are
+#################################################################
+
+### We use didifflib.SequenceMatcher() to measure similarities
+### at the char level (vs. word level).
+### See seq_matcher function for more details.
+
+df_all['seqmatch_title_tuple']=df_all.apply(lambda x: \
+            seq_matcher(x['search_term_stemmed'],x['product_title_stemmed']),axis=1)
+df_all['seqmatch_title_ratio'] = df_all['seqmatch_title_tuple'].map(lambda x: x[0])
+df_all['seqmatch_title_ratioscaled'] = df_all['seqmatch_title_tuple'].map(lambda x: x[1])
+df_all=df_all.drop(['seqmatch_title_tuple'],axis=1)
+
+
+df_all['seqmatch_description_tuple']=df_all.apply(lambda x: \
+            seq_matcher(x['search_term_stemmed'],x['product_description_stemmed']),axis=1)
+df_all['seqmatch_description_ratio'] = df_all['seqmatch_description_tuple'].map(lambda x: x[0])
+df_all['seqmatch_description_ratioscaled'] = df_all['seqmatch_description_tuple'].map(lambda x: x[1])
+df_all=df_all.drop(['seqmatch_description_tuple'],axis=1)
+
+df_all['seqmatch_bullets_tuple']=df_all.apply(lambda x: \
+            seq_matcher(x['search_term_stemmed'],x['attribute_bullets_stemmed']),axis=1)
+df_all['seqmatch_bullets_ratio'] = df_all['seqmatch_bullets_tuple'].map(lambda x: x[0])
+df_all['seqmatch_bullets_ratioscaled'] = df_all['seqmatch_bullets_tuple'].map(lambda x: x[1])
+df_all=df_all.drop(['seqmatch_bullets_tuple'],axis=1)
+
+df_all['seqmatch_desc&bullets_tuple']=df_all.apply(lambda x: \
+            seq_matcher(x['search_term_stemmed'],x['product_description_stemmed']+" "+x['attribute_bullets_stemmed']),axis=1)
+df_all['seqmatch_desc&bullets_ratio'] = df_all['seqmatch_desc&bullets_tuple'].map(lambda x: x[0])
+df_all['seqmatch_desc&bullets_ratioscaled'] = df_all['seqmatch_desc&bullets_tuple'].map(lambda x: x[1])
+df_all=df_all.drop(['seqmatch_desc&bullets_tuple'],axis=1)
+
+print 'sequence match time:',round((time()-t0)/60,1) ,'minutes\n'
+
+
+
+#################################################################
+### STEP 7: Some TFIDF features
+#################################################################
+
+from sklearn.feature_extraction.text import TfidfTransformer, TfidfVectorizer
+from scipy.sparse import csr_matrix
+
+vectorizer_title =  TfidfVectorizer(stop_words='english',max_df=0.5) 
+vectorizer_description =  TfidfVectorizer(stop_words='english',max_df=0.5) 
+vectorizer_bullets =  TfidfVectorizer(stop_words='english',max_df=0.5) 
+
+features_title = vectorizer_title.fit_transform(list(set(list(df_all['product_title_stemmed'])))) 
+features_description = vectorizer_description.fit_transform(list(set(list(df_all['product_description_stemmed'])))) 
+features_bullets = vectorizer_bullets.fit_transform(list(set(list(df_all['attribute_bullets_stemmed'])))) 
+
+tfidf_title = vectorizer_title.transform(df_all['search_term_stemmed']) 
+tfidf_description = vectorizer_description.transform(df_all['search_term_stemmed']) 
+tfidf_bullets = vectorizer_bullets.transform(df_all['search_term_stemmed']) 
+
+tfidf_title_querythekey = vectorizer_title.transform(df_all['search_term_thekey_stemmed'])
+tfidf_title_querybeforethekey = vectorizer_title.transform(df_all['search_term_beforethekey_stemmed'])
+
+
+tfidf_matchtitle = vectorizer_title.transform(df_all['word_in_title_string'])
+tfidf_matchtitle_stringonly = vectorizer_title.transform(df_all['word_in_title_string_only_string'])
+tfidf_matchdescription = vectorizer_description.transform(df_all['word_in_description_string']) 
+tfidf_matchdescription_stringonly = vectorizer_description.transform(df_all['word_in_description_string_only_string']) 
+tfidf_matchbullets = vectorizer_bullets.transform(df_all['word_in_bullets_string']) 
+tfidf_matchbullets_stringonly = vectorizer_bullets.transform(df_all['word_in_bullets_string_only_string']) 
+
+len(vectorizer_title.get_feature_names())
+len(vectorizer_description.get_feature_names())
+len(vectorizer_bullets.get_feature_names())
+
+uno_title=np.ones((len(vectorizer_title.get_feature_names()),1))
+uno_description=np.ones((len(vectorizer_description.get_feature_names()),1))
+uno_bullets=np.ones((len(vectorizer_bullets.get_feature_names()),1))
+
+let_title=np.asarray([[len(word)] for word in vectorizer_title.get_feature_names()])
+let_description=np.asarray([[len(word)] for word in vectorizer_description.get_feature_names()])
+let_bullets=np.asarray([[len(word)] for word in vectorizer_bullets.get_feature_names()])
+
+
+df_all['tfidf_title_num']=tfidf_title.tocsr().dot(uno_title)
+df_all['tfidf_description_num']=tfidf_description.tocsr().dot(uno_description)
+df_all['tfidf_bullets_num']=tfidf_bullets.tocsr().dot(uno_bullets)
+
+df_all['tfidf_title_let']=tfidf_title.tocsr().dot(let_title)
+df_all['tfidf_description_let']=tfidf_description.tocsr().dot(let_description)
+df_all['tfidf_bullets_let']=tfidf_bullets.tocsr().dot(let_bullets)
+
+df_all['tfidf_matchtitle_num']=tfidf_matchtitle.tocsr().dot(uno_title)
+df_all['tfidf_matchdescription_num']=tfidf_matchdescription.tocsr().dot(uno_description)
+df_all['tfidf_matchbullets_num']=tfidf_matchbullets.tocsr().dot(uno_bullets)
+
+df_all['tfidf_matchtitle_stringonly_num']=tfidf_matchtitle_stringonly.tocsr().dot(uno_title)
+df_all['tfidf_matchdescription_stringonly_num']=tfidf_matchdescription_stringonly.tocsr().dot(uno_description)
+df_all['tfidf_matchbullets_stringonly_num']=tfidf_matchbullets_stringonly.tocsr().dot(uno_bullets)
+
+
+df_all['tfidf_title_querythekey_num']=tfidf_title_querythekey.tocsr().dot(uno_title)
+df_all['tfidf_title_querybeforethekey_num']=tfidf_title_querybeforethekey.tocsr().dot(uno_title)
+df_all['tfidf_title_querythekey_let']=tfidf_title_querythekey.tocsr().dot(let_title)
+df_all['tfidf_title_querybeforethekey_let']=tfidf_title_querybeforethekey.tocsr().dot(let_title)
+
+
+
+print 'tfidf basic features time:',round((time()-t0)/60,1) ,'minutes\n'
+t0 = time()
+
+df_all['tfidf_nn_important_in_title_num']=vectorizer_title.transform(df_all['search_term_tokens'].map(lambda x:nn_important_words(x)) ).tocsr().dot(uno_title)
+df_all['tfidf_nn_important_in_description_num']=vectorizer_description.transform(df_all['search_term_tokens'].map(lambda x:nn_important_words(x)) ).tocsr().dot(uno_description)
+df_all['tfidf_nn_important_in_bullets_num']=vectorizer_bullets.transform(df_all['search_term_tokens'].map(lambda x:nn_important_words(x)) ).tocsr().dot(uno_bullets)
+df_all['tfidf_nn_important_in_title_let']=vectorizer_title.transform(df_all['search_term_tokens'].map(lambda x:nn_important_words(x)) ).tocsr().dot(let_title)
+df_all['tfidf_nn_important_in_description_let']=vectorizer_description.transform(df_all['search_term_tokens'].map(lambda x:nn_important_words(x)) ).tocsr().dot(let_description)
+df_all['tfidf_nn_important_in_bullets_let']=vectorizer_bullets.transform(df_all['search_term_tokens'].map(lambda x:nn_important_words(x)) ).tocsr().dot(let_bullets)
+
+df_all['tfidf_nn_unimportant_in_title_num']=vectorizer_title.transform(df_all['search_term_tokens'].map(lambda x:nn_unimportant_words(x)) ).tocsr().dot(uno_title)
+df_all['tfidf_nn_unimportant_in_description_num']=vectorizer_description.transform(df_all['search_term_tokens'].map(lambda x:nn_unimportant_words(x)) ).tocsr().dot(uno_description)
+df_all['tfidf_nn_unimportant_in_bullets_num']=vectorizer_bullets.transform(df_all['search_term_tokens'].map(lambda x:nn_unimportant_words(x)) ).tocsr().dot(uno_bullets)
+df_all['tfidf_nn_unimportant_in_title_let']=vectorizer_title.transform(df_all['search_term_tokens'].map(lambda x:nn_unimportant_words(x)) ).tocsr().dot(let_title)
+df_all['tfidf_nn_unimportant_in_description_let']=vectorizer_description.transform(df_all['search_term_tokens'].map(lambda x:nn_unimportant_words(x)) ).tocsr().dot(let_description)
+df_all['tfidf_nn_unimportant_in_bullets_let']=vectorizer_bullets.transform(df_all['search_term_tokens'].map(lambda x:nn_unimportant_words(x)) ).tocsr().dot(let_bullets)
+
+df_all['tfidf_vbg_in_title_num']=vectorizer_title.transform(df_all['search_term_tokens'].map(lambda x:vbg_words(x)) ).tocsr().dot(uno_title)
+df_all['tfidf_vbg_in_description_num']=vectorizer_description
