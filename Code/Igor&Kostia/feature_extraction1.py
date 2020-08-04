@@ -1311,4 +1311,196 @@ df_all['tfidf_nn_unimportant_in_description_let']=vectorizer_description.transfo
 df_all['tfidf_nn_unimportant_in_bullets_let']=vectorizer_bullets.transform(df_all['search_term_tokens'].map(lambda x:nn_unimportant_words(x)) ).tocsr().dot(let_bullets)
 
 df_all['tfidf_vbg_in_title_num']=vectorizer_title.transform(df_all['search_term_tokens'].map(lambda x:vbg_words(x)) ).tocsr().dot(uno_title)
-df_all['tfidf_vbg_in_description_num']=vectorizer_description
+df_all['tfidf_vbg_in_description_num']=vectorizer_description.transform(df_all['search_term_tokens'].map(lambda x:vbg_words(x)) ).tocsr().dot(uno_description)
+df_all['tfidf_vbg_in_bullets_num']=vectorizer_bullets.transform(df_all['search_term_tokens'].map(lambda x:vbg_words(x)) ).tocsr().dot(uno_bullets)
+df_all['tfidf_vbg_in_title_let']=vectorizer_title.transform(df_all['search_term_tokens'].map(lambda x:vbg_words(x)) ).tocsr().dot(let_title)
+df_all['tfidf_vbg_in_description_let']=vectorizer_description.transform(df_all['search_term_tokens'].map(lambda x:vbg_words(x)) ).tocsr().dot(let_description)
+df_all['tfidf_vbg_in_bullets_let']=vectorizer_bullets.transform(df_all['search_term_tokens'].map(lambda x:vbg_words(x)) ).tocsr().dot(let_bullets)
+
+
+df_all['tfidf_jj_rb_in_title_num']=vectorizer_title.transform(df_all['search_term_tokens'].map(lambda x:jj_rb_words(x)) ).tocsr().dot(uno_title)
+df_all['tfidf_jj_rb_in_description_num']=vectorizer_description.transform(df_all['search_term_tokens'].map(lambda x:jj_rb_words(x)) ).tocsr().dot(uno_description)
+df_all['tfidf_jj_rb_in_bullets_num']=vectorizer_bullets.transform(df_all['search_term_tokens'].map(lambda x:jj_rb_words(x)) ).tocsr().dot(uno_bullets)
+df_all['tfidf_jj_rb_in_title_let']=vectorizer_title.transform(df_all['search_term_tokens'].map(lambda x:jj_rb_words(x)) ).tocsr().dot(let_title)
+df_all['tfidf_jj_rb_in_description_let']=vectorizer_description.transform(df_all['search_term_tokens'].map(lambda x:jj_rb_words(x)) ).tocsr().dot(let_description)
+df_all['tfidf_jj_rb_in_bullets_let']=vectorizer_bullets.transform(df_all['search_term_tokens'].map(lambda x:jj_rb_words(x)) ).tocsr().dot(let_bullets)
+
+
+
+df_all=df_all.drop(['word_in_title_string','word_in_title_string_only_string','word_in_description_string',\
+'word_in_description_string_only_string','word_in_bullets_string','word_in_bullets_string_only_string'],axis=1)
+
+print 'tfidf advanced features time:',round((time()-t0)/60,1) ,'minutes\n'
+t0 = time()
+
+
+
+
+
+#################################################################
+### STEP 8: Unique query, title, etc
+#################################################################
+"""
+
+aa=list(set(list(df_all['product_description'])))
+my_dict={}
+for i in range(0,len(set(list(df_all['product_description'])))):
+    my_dict[aa[i]]=i
+df_all['uniq_product_description']=df_all['product_description'].map(lambda x: 100000+my_dict[x])
+
+aa=list(set(list(df_all['product_title'])))
+my_dict={}
+for i in range(0,len(set(list(df_all['product_title'])))):
+    my_dict[aa[i]]=i
+df_all['uniq_product_title']=df_all['product_title'].map(lambda x: 100000+my_dict[x])
+
+aa=list(set(list(df_all['search_term_parsed'])))
+my_dict={}
+for i in range(0,len(set(list(df_all['search_term_parsed'])))):
+    my_dict[aa[i]]=i
+df_all['uniq_query']=df_all['search_term_parsed'].map(lambda x: 100000+my_dict[x])
+
+
+
+df_all['text']=df_all['uniq_query'].map(lambda x: str(x))+"_"+df_all['uniq_product_title'].map(lambda x: str(x))+"_"+df_all['uniq_product_description'].map(lambda x: str(x))
+aa=list(set(list(df_all['text'])))
+my_dict={}
+for i in range(0,len(set(list(df_all['text'])))):
+    my_dict[aa[i]]=i
+df_all['uniq_query_title_description']=df_all['text'].map(lambda x: 100000+my_dict[x])
+
+df_all['text']=df_all['uniq_query'].map(lambda x: str(x))+"_"+df_all['uniq_product_title'].map(lambda x: str(x))
+aa=list(set(list(df_all['text'])))
+my_dict={}
+for i in range(0,len(set(list(df_all['text'])))):
+    my_dict[aa[i]]=i
+df_all['uniq_query_title']=df_all['text'].map(lambda x: 100000+my_dict[x])
+
+df_all['text']=df_all['uniq_query'].map(lambda x: str(x))+"_"+df_all['uniq_product_description'].map(lambda x: str(x))
+aa=list(set(list(df_all['text'])))
+my_dict={}
+for i in range(0,len(set(list(df_all['text'])))):
+    my_dict[aa[i]]=i
+df_all['uniq_query_description']=df_all['text'].map(lambda x: 100000+my_dict[x])
+df_all=df_all.drop(['text'],axis=1)
+
+
+
+
+aa=list(set(list(df_all['search_term_thekey_stemmed'])))
+my_dict={}
+for i in range(0,len(set(list(df_all['search_term_thekey_stemmed'])))):
+    my_dict[aa[i]]=i
+df_all['uniq_query_thekey']=df_all['search_term_thekey_stemmed'].map(lambda x: my_dict[x])
+
+
+aa=list(set(list(df_all['product_title_thekey_stemmed'])))
+my_dict={}
+for i in range(0,len(set(list(df_all['product_title_thekey_stemmed'])))):
+    my_dict[aa[i]]=i
+df_all['uniq_product_title_thekey']=df_all['product_title_thekey_stemmed'].map(lambda x: my_dict[x])
+
+
+aa=list(set(list(df_all['search_term_keys_stemmed'])))
+my_dict={}
+for i in range(0,len(set(list(df_all['search_term_keys_stemmed'])))):
+    my_dict[aa[i]]=i
+df_all['uniq_query_keys']=df_all['search_term_keys_stemmed'].map(lambda x: my_dict[x])
+
+
+aa=list(set(list(df_all['product_title_keys_stemmed'])))
+my_dict={}
+for i in range(0,len(set(list(df_all['product_title_keys_stemmed'])))):
+    my_dict[aa[i]]=i
+df_all['uniq_product_title_keys']=df_all['product_title_keys_stemmed'].map(lambda x: my_dict[x])
+
+print 'new unique features time:',round((time()-t0)/60,1) ,'minutes\n'
+t0 = time()
+
+df_all['text']=df_all['search_term_keys_stemmed'].map(lambda x: str(x))+"_"+df_all['product_title_keys_stemmed'].map(lambda x: str(x))
+aa=list(set(list(df_all['text'])))
+my_dict={}
+for i in range(0,len(set(list(df_all['text'])))):
+    my_dict[aa[i]]=i
+df_all['uniq_query_title_keys']=df_all['text'].map(lambda x: 10000+my_dict[x])
+df_all=df_all.drop(['text'],axis=1)
+
+df_all['text']=df_all['search_term_thekey_stemmed'].map(lambda x: str(x))+"_"+df_all['product_title_thekey_stemmed'].map(lambda x: str(x))
+aa=list(set(list(df_all['text'])))
+my_dict={}
+for i in range(0,len(set(list(df_all['text'])))):
+    my_dict[aa[i]]=i
+df_all['uniq_query_title_thekeys']=df_all['text'].map(lambda x: 10000+my_dict[x])
+df_all=df_all.drop(['text'],axis=1)
+
+
+df_all['text']=df_all['search_term_beforethekey_stemmed'].map(lambda x: str(x))+"_"+df_all['search_term_thekey_stemmed'].map(lambda x: str(x))
+aa=list(set(list(df_all['text'])))
+my_dict={}
+for i in range(0,len(set(list(df_all['text'])))):
+    my_dict[aa[i]]=i
+df_all['uniq_query_beforethekeythekey']=df_all['text'].map(lambda x: 10000+my_dict[x])
+df_all=df_all.drop(['text'],axis=1)
+
+
+
+df_all['text']=df_all['product_title_beforethekey_stemmed'].map(lambda x: str(x))+"_"+df_all['product_title_thekey_stemmed'].map(lambda x: str(x))
+aa=list(set(list(df_all['text'])))
+my_dict={}
+for i in range(0,len(set(list(df_all['text'])))):
+    my_dict[aa[i]]=i
+df_all['uniq_title_beforethekeythekey']=df_all['text'].map(lambda x: 10000+my_dict[x])
+df_all=df_all.drop(['text'],axis=1)
+
+
+df_all['text']=df_all['search_term_beforethekey_stemmed'].map(lambda x: str(x))+"_"+df_all['search_term_thekey_stemmed'].map(lambda x: str(x))+"_" \
++df_all['product_title_beforethekey_stemmed'].map(lambda x: str(x))+"_"+df_all['product_title_thekey_stemmed'].map(lambda x: str(x))
+aa=list(set(list(df_all['text'])))
+my_dict={}
+for i in range(0,len(set(list(df_all['text'])))):
+    my_dict[aa[i]]=i
+df_all['uniq_queryandtitle_beforethekeythekey']=df_all['text'].map(lambda x: 10000+my_dict[x])
+df_all=df_all.drop(['text'],axis=1)
+
+
+
+aa=list(set(list(df_all['brand_parsed'])))
+my_dict={}
+for i in range(0,len(set(list(df_all['brand_parsed'])))):
+    my_dict[aa[i]]=i
+df_all['uniq_brand']=df_all['brand_parsed'].map(lambda x: 10000+my_dict[x])
+
+print 'create unique... variables time:',round((time()-t0)/60,1) ,'minutes\n'
+t0 = time()
+
+df_all=df_all.drop(['product_info'],axis=1)
+
+
+"""
+
+#################################################################
+### STEP 9: 'Query expansion'
+#################################################################
+
+### For each comination of beforethekey_thekey in query
+### create the list of the most common words from product description.
+### Since the average relevance tends to be closer to 3 than to 1,
+### the majority of matched products are *relevant*. It means that 
+### the most common words in matched product description denote 
+### high level of relevance. So, we can assess relevance by estimating
+### how many common words the prodcut description contains.
+
+t2=time()
+df_all['search_term_beforethekey_thekey_stemmed']=df_all['search_term_beforethekey_stemmed']+"_"+df_all['search_term_thekey_stemmed']
+aa=list(set(list(df_all['search_term_beforethekey_thekey_stemmed'])))
+similarity_dict={}
+for i in range(0,len(aa)):
+    # get unique words from each product description then concatenate all results:
+    all_descriptions= " ".join(list(df_all['product_description_stemmed_woBrand'][df_all['search_term_beforethekey_thekey_stemmed']==aa[i]].map(lambda x: " ".join(list(set(x.split())))   )  ))
+    # and transform to a list:    
+    all_descriptions_list=all_descriptions.split()
+    # vocabulary is simly a set of unique words:
+    vocabulary=list(set(all_descriptions_list))
+    #count the frequency of each combination of beforethekey_thekey
+    cnt=list(df_all['search_term_beforethekey_thekey_stemmed']).count(aa[i])    
+    freqs=[1.0*all_descriptions_list.count(w)/cnt for w in vocabula
