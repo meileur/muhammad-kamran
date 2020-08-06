@@ -1503,4 +1503,195 @@ for i in range(0,len(aa)):
     vocabulary=list(set(all_descriptions_list))
     #count the frequency of each combination of beforethekey_thekey
     cnt=list(df_all['search_term_beforethekey_thekey_stemmed']).count(aa[i])    
-    freqs=[1.0*all_descriptions_list.count(w)/cnt for w in vocabula
+    freqs=[1.0*all_descriptions_list.count(w)/cnt for w in vocabulary]
+    
+    vocabulary+=['dummyword0', 'dummyword1', 'dummyword2', 'dummyword3', 'dummyword4', 'dummyword5',\
+    'dummyword6', 'dummyword7', 'dummyword8', 'dummyword9', 'dummyword10', 'dummyword11', 'dummyword12',\
+    'dummyword13', 'dummyword14', 'dummyword15', 'dummyword16', 'dummyword17', 'dummyword18', \
+    'dummyword19', 'dummyword20', 'dummyword21', 'dummyword22', 'dummyword23', 'dummyword24', 'dummyword25',\
+    'dummyword26', 'dummyword27', 'dummyword28', 'dummyword29']
+    freqs+=list(np.zeros(30))
+    similarity_dict[aa[i]]={"cnt": cnt, 'words':sorted(zip(vocabulary,freqs),key=lambda x: x[1],reverse=True)[0:30]}
+
+    if (i % 2000)==0:
+        print ""+str(i)+" out of "+str(len(aa))+" unique combinations; "+str(round((time()-t2)/60,1))+" minutes"
+
+print 'create similarity dict time:',round((time()-t0)/60,1) ,'minutes\n'
+t0 = time()
+
+### check the next var for potential overfit
+#df_all['frequency_of_beforethekey_thekey']=df_all['search_term_beforethekey_thekey_stemmed'].map(lambda x: int(similarity_dict[x]['cnt']) * int(x!="_"))
+
+df_all['above8_dummy_frequency_of_beforethekey_thekey']=df_all['search_term_beforethekey_thekey_stemmed'].map(lambda x: int(similarity_dict[x]['cnt']>=8 and x!="_"))
+
+
+
+
+### Get the frequency of top words
+### Assume the product descriptions consist only of three words:
+### word1 appears in 80% of descriptions
+### word2 appears in 60% of descriptions
+### word3 appears in 40% of descriptions
+### Then we encounter a product description with word1 and word3, but no word2.
+### In this example the sum frequencies for matched words is 0.8+0.4=1.2;
+### the sum of frequencies for all words is 0.8+0.6+0.4=1.8 
+def get_description_similarity(str_thekey_pair,str_description,similarity_dict_item):   
+    values=np.zeros(30)
+    values0=np.zeros(30)
+    if str_thekey_pair!="_" and similarity_dict_item['cnt']>=8:
+        for j in range(0,30):
+            ## frequencies for matched words
+            values[j]=similarity_dict_item['words'][j][1]*int(" "+similarity_dict_item['words'][j][0]+" " in " "+str_description+" ")
+            #frequencies for all words            
+            values0[j]=similarity_dict_item['words'][j][1]
+    return sum(values[0:10]),sum(values[0:20]),sum(values[0:30]), sum(values0[0:10]),sum(values0[0:20]),sum(values0[0:30])
+            
+
+df_all['description_similarity_tuple']=df_all.apply(lambda x: \
+            get_description_similarity(x['search_term_beforethekey_thekey_stemmed'],x['product_description_stemmed'],\
+                similarity_dict[x['search_term_beforethekey_thekey_stemmed']]),axis=1)
+                
+
+df_all['description_similarity_10']=df_all['description_similarity_tuple'].map(lambda x: x[0]/10.0)
+df_all['description_similarity_20']=df_all['description_similarity_tuple'].map(lambda x: x[1]/20.0)
+df_all['description_similarity_11-20']=df_all['description_similarity_tuple'].map(lambda x: (x[1]-x[0])/10.0)
+df_all['description_similarity_30']=df_all['description_similarity_tuple'].map(lambda x: x[2]/30.0)
+df_all['description_similarity_21-30']=df_all['description_similarity_tuple'].map(lambda x: (x[2]-x[1])/10.0)
+
+df_all['description_similarity_10rel']=df_all['description_similarity_tuple'].map(lambda x: 1.0*x[0]/x[3] if x[3]>0.00001 else 0.0)
+df_all['description_similarity_20rel']=df_all['description_similarity_tuple'].map(lambda x: 1.0*x[1]/x[4] if x[4]>0.00001 else 0.0)
+df_all['description_similarity_11-20rel']=df_all['description_similarity_tuple'].map(lambda x: 1.0*(x[1]-x[0])/(x[4]-x[3]) if (x[4]-x[3])>0.00001 else 0.0)
+df_all['description_similarity_30rel']=df_all['description_similarity_tuple'].map(lambda x: 1.0*x[2]/x[5] if x[5]>0.00001 else 0.0)
+df_all['description_similarity_21-30rel']=df_all['description_similarity_tuple'].map(lambda x: 1.0*(x[2]-x[1])/(x[5]-x[4]) if (x[5]-x[4])>0.00001 else 0.0)
+
+df_all['description_similarity_11-20to10']=df_all['description_similarity_tuple'].map(lambda x: 1.0*x[4]/x[3] if x[3]>0.00001 else 0.0)
+df_all['description_similarity_21-30to10']=df_all['description_similarity_tuple'].map(lambda x: 1.0*x[5]/x[3] if x[3]>0.00001 else 0.0)
+
+
+# this was added later, so this var is saved separately
+df_all['above15_dummy_frequency_of_beforethekey_thekey']=df_all['search_term_beforethekey_thekey_stemmed'].map(lambda x: int(similarity_dict[x]['cnt']>=15 and x!="_"))
+
+t0 = time()
+aa=list(set(list(df_all['search_term_beforethekey_thekey_stemmed'])))
+my_dict={}
+for i in range(0,len(aa)):
+    my_dict[aa[i]]=df_all['description_similarity_20'][df_all['search_term_beforethekey_thekey_stemmed']==aa[i]]
+    if i % 200==0:
+        print i, "out of", len(aa), ";", round((time()-t0)/60,1) ,'minutes'
+
+
+def get_percentile_similarity(similarity20, str_thekey_pair, dict_item):   
+    output=0.5
+    N=len(dict_item)
+    if str_thekey_pair!="_" and N>=8:
+        n=sum(dict_item>=similarity20)
+        assert n>0
+        output = 1.0*(n-1)/(N-1)
+    return output
+    
+df_all['description20_percentile']=df_all.apply(lambda x: \
+            get_percentile_similarity(x['description_similarity_20'],x['search_term_beforethekey_thekey_stemmed'],\
+            my_dict[x['search_term_beforethekey_thekey_stemmed']]),axis=1)
+
+
+# these vars were added later, so they are saved separately    
+df_all[['id','above15_dummy_frequency_of_beforethekey_thekey','description20_percentile']].to_csv(FEATURES_DIR+"/df_feature_above15_ext.csv", index=False)
+df_all=df_all.drop(['above15_dummy_frequency_of_beforethekey_thekey','description20_percentile'],axis=1)
+    
+
+
+
+
+print 'create description similarity variables time:',round((time()-t0)/60,1) ,'minutes\n'
+t0 = time()
+
+df_all=df_all.drop(['description_similarity_tuple'],axis=1)
+
+df_all=df_all.drop(['search_term_beforethekey_thekey_stemmed'],axis=1)
+
+
+df_all.drop(string_variables_list,axis=1).to_csv(FEATURES_DIR+"/df_basic_features.csv", index=False)
+print 'save file time:',round((time()-t0)/60,1) ,'minutes\n'
+t0 = time()  
+
+
+#################################################################
+### STEP 10: Brand and material dummies
+#################################################################
+
+df_all=df_all[['id']+string_variables_list]
+
+brand_dict={}
+material_dict={}
+import csv
+with open(PROCESSINGTEXT_DIR+'/brand_statistics.csv') as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        brand_dict[row['name']]={'cnt_attribute': int(row['cnt_attribute']), 'cnt_query': int(row['cnt_query'])}
+        
+with open(PROCESSINGTEXT_DIR+'/material_statistics.csv') as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        material_dict[row['name']]={'cnt_attribute': int(row['cnt_attribute']), 'cnt_query': int(row['cnt_query'])}
+
+#def create_dummy_value(lst,item):
+#    return int(item in lst) * int(len(item)>1)
+
+
+def col_create_brandmaterial_dummy(col_brandmaterial_txt,bm):
+    bm_in_text=col_brandmaterial_txt.map(lambda x: x.split(';'))
+    return bm_in_text.map(lambda x: int(bm in x))
+    
+
+BM_THRESHOLD=500
+cnt=0
+cnt1=0
+for brand in brand_dict.keys():
+    cnt+=1
+    if brand_dict[brand]['cnt_attribute']>BM_THRESHOLD:
+        cnt1+=1
+        df_all["BRANDdummyintitle_"+brand.replace(" ","")]=\
+            col_create_brandmaterial_dummy(df_all['brands_in_product_title'],brand)
+    if brand_dict[brand]['cnt_query']>BM_THRESHOLD:
+        cnt1+=1
+        df_all["BRANDdummyinquery_"+brand.replace(" ","")]=\
+            col_create_brandmaterial_dummy(df_all['brands_in_search_term'],brand)
+    if cnt % 200==0:
+        print cnt,"brands processed;", cnt1, "dummies created"
+
+cnt=0
+cnt1=0            
+for material in material_dict.keys():
+    cnt+=1
+    if material_dict[material]['cnt_attribute']>BM_THRESHOLD:
+        cnt1+=1
+        df_all["MATERIALdummyintitle_"+material.replace(" ","")]=\
+            col_create_brandmaterial_dummy(df_all['materials_in_product_title'],material)
+    if material_dict[material]['cnt_query']>BM_THRESHOLD:
+        cnt1+=1
+        df_all["MATERIALdummyinquery_"+material.replace(" ","")]=\
+            col_create_brandmaterial_dummy(df_all['materials_in_search_term'],material)
+    if cnt % 200==0:
+        print cnt,"materials processed;", cnt1, "dummies created"    
+    
+
+print 'create brand and material dummies time:',round((time()-t0)/60,1) ,'minutes\n'
+t0 = time()        
+
+
+
+df_all.drop(string_variables_list,axis=1).to_csv(FEATURES_DIR+"/df_brand_material_dummies.csv", index=False)
+print 'save file time:',round((time()-t0)/60,1) ,'minutes\n'
+t0 = time()  
+
+
+#################################################################
+### STEP 11: Thekey dummies
+#################################################################
+
+df_all=df_all[['id']+string_variables_list]
+
+
+THEKEY_THRESHOLD=500
+lst=list(df_all['product_title_thekey_stemmed'])
+freqs=[(w,lst.count(w)) for w in 
