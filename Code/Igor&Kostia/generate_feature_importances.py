@@ -89,4 +89,58 @@ y_pred[y_pred>3.]=3.
 
 pd.DataFrame({"id": id_test, "relevance": y_pred}).to_csv(MODELS_DIR+'/submission_benchmark_without_dummies.csv',index=False)
 sorted_idx = np.argsort(clf.feature_importances_)
-pd.DataFrame({"name":df_al
+pd.DataFrame({"name":df_all.keys().drop(['id','relevance'])[sorted_idx], "importance": clf.feature_importances_[sorted_idx]}).to_csv(MODELS_DIR+'/feature_importances_benchmark_without_dummies.csv',index=False)
+
+print "file saved"
+print 'modelling time:',round((time()-t0)/60,1) ,'minutes\n'
+t0 = time()
+
+
+#### load feature importances from file
+df_importance = pd.read_csv(MODELS_DIR+'/feature_importances_benchmark_without_dummies.csv', encoding="utf-8")
+df_importance=df_importance.sort_values(['importance'],ascending=[0])
+df_importance['cumulative']=df_importance['importance'].map(lambda x: sum(df_importance['importance'][df_importance['importance']>=x]))
+var_list=list(df_importance['name'][df_importance['cumulative']<0.990])
+
+
+# use only 40 vars in the next step
+df_all=df_all[['id','relevance']+var_list[0:40]]
+
+
+# load dummies
+df_bm_dummy = pd.read_csv(FEATURES_DIR+'/df_brand_material_dummies.csv', encoding="utf-8")
+df_thekey_dummy = pd.read_csv(FEATURES_DIR+'/df_thekey_dummies.csv', encoding="utf-8")
+df_all = pd.merge(df_all, df_bm_dummy, how='left', on='id')
+df_all = pd.merge(df_all, df_thekey_dummy, how='left', on='id')
+
+# generate matrices to be used in clf
+df_train = df_all.iloc[:num_train]
+df_test = df_all.iloc[num_train:]
+id_test = df_test['id']
+id_train = df_train['id']
+
+y_train = df_train['relevance'].values
+X_train = df_train.drop(['id','relevance'],axis=1).values
+X_test = df_test.drop(['id','relevance'],axis=1).values
+
+#################################################################################
+##### use GradientBoostingRegressor to generate feature importances for dummies
+t0 = time()
+params = {'n_estimators': 500, 'max_depth': 6, 'min_samples_split': 1, 'min_samples_leaf':15, 'learning_rate': 0.035, 'loss': 'ls', 'verbose':1}
+clf = GradientBoostingRegressor(**params)
+
+clf.fit(X_train, y_train)
+
+y_pred = clf.predict(X_test)
+y_pred[y_pred<1.]=1.
+y_pred[y_pred>3.]=3.
+
+
+pd.DataFrame({"id": id_test, "relevance": y_pred}).to_csv(MODELS_DIR+'/submission_benchmark_top40_and_dummies.csv',index=False)
+sorted_idx = np.argsort(clf.feature_importances_)
+pd.DataFrame({"name":df_all.keys().drop(['id','relevance'])[sorted_idx], "importance": clf.feature_importances_[sorted_idx]}).to_csv(MODELS_DIR+'/feature_importances_benchmark_top40_and_dummies.csv',index=False)
+
+print "file saved"
+print 'modelling time:',round((time()-t0)/60,1) ,'minutes\n'
+t0 = time()
+
