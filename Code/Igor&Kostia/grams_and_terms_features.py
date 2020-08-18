@@ -675,4 +675,39 @@ t0 = time()
 df_all['st_pt__biterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_biterm'], x['pt_biterm'] ), axis=1))
 print 'time:',round(time()-t0,3) ,'s\n'
 df_all['st_pd__biterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_biterm'], x['pd_bigram'] ), axis=1))
-print 'time:',round(time()-
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_at__biterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_biterm'], x['at_bigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_pd__biterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_biterm'], x['pd_bigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_at__biterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_biterm'], x['at_bigram'] ), axis=1))
+
+
+print 'biterm time:',round(time()-t0,3) ,'s\n'
+
+t0 = time()
+df_all['st_pt__triterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_triterm'], x['pt_triterm'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_pd__triterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_triterm'], x['pd_trigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_at__triterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_triterm'], x['at_trigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_pd__triterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_triterm'], x['pd_trigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_at__triterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_triterm'], x['at_trigram'] ), axis=1))
+
+
+print 'triterm time:',round(time()-t0,3) ,'s\n'
+
+
+#save features
+b=df_all[df_all.keys()[25:len(df_all.keys())]]
+b["id"]=df_all["id"]
+b.to_csv(FEATURES_DIR+"/df_dist_new.csv", index=False, encoding="utf-8")
+df_all=df_all.drop(df_all.keys()[25:len(df_all.keys())],axis=1)  
+
+
+
+
+
+
