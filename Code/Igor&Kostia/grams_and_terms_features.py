@@ -297,4 +297,239 @@ df_all['st_triterm'] = df_all['product_info'].map(lambda x:getTriterm(x.split('\
 df_all['pt_triterm'] = df_all['product_info'].map(lambda x:getTriterm(x.split('\t')[3],"_"))
 #df_all['pd_triterm'] = df_all['product_info'].map(lambda x:getTriterm(x.split('\t')[5],"_"))
 #df_all['ab_triterm'] = df_all['product_info'].map(lambda x:getTriterm(x.split('\t')[7],"_"))
-#df_all[
+#df_all['at_triterm'] = df_all['product_info'].map(lambda x:getTriterm(x.split('\t')[9],"_"))
+print 'triterm time:',round(time()-t0,3) ,'s\n'
+
+st_names=["st_biterm", "pt_biterm","st_triterm", "pt_triterm"]
+b=df_all[st_names]
+b["id"]=df_all["id"]
+b.to_csv(PROCESSINGTEXT_DIR+"/df_bitriterm.csv", index=False, encoding='utf-8') 
+#df_all=df_all.drop(st_names,axis=1)
+print 6
+
+
+u= pd.read_csv(PROCESSINGTEXT_DIR+'/df_unigram.csv')
+b= pd.read_csv(PROCESSINGTEXT_DIR+'/df_bigram.csv')
+t= pd.read_csv(PROCESSINGTEXT_DIR+'/df_trigram.csv')
+f= pd.read_csv(PROCESSINGTEXT_DIR+'/df_fourgram.csv')
+bt= pd.read_csv(PROCESSINGTEXT_DIR+'/df_bitriterm.csv')
+
+df_all=pd.merge(u, b, how="left", on="id")
+df_all=pd.merge(df_all, t, how="left", on="id")
+df_all=pd.merge(df_all, f, how="left", on="id")
+df_all=pd.merge(df_all, bt, how="left", on="id")
+
+df_all["id"]=df_all2["id"]
+
+df_all.to_csv(PROCESSINGTEXT_DIR+"/df_with_all_terms_final.csv", index=False, encoding='utf-8') 
+
+print "gram is over"
+
+
+
+########################
+######tfidf_intersect_features
+#######################
+
+df_all= pd.read_csv(PROCESSINGTEXT_DIR+'/df_with_all_terms_final.csv')
+gc.collect()
+
+   
+
+def replace_nan(s):
+        if pd.isnull(s)==True:
+                s=""
+        return s
+        
+
+t0 = time()
+for i in range(0,len(df_all.keys())-1):
+    print  df_all.ix[:,i][0:1]
+    df_all.ix[:,i] = df_all.ix[:,i].map(lambda x:replace_nan(x))
+    
+    print  df_all.ix[:,i][0:1]
+    print i
+
+
+
+
+def intersect2(a, b):
+     a=str(a)
+     b=str(b)
+     
+     a=a.replace(' ','')
+     a=a.replace('[','')
+     a=a.replace(']','')
+     b=b.replace(' ','')
+     b=b.replace('[','')
+     b=b.replace(']','')
+     
+     d = list(set(list(a.split(","))) & set(list(b.split(","))))
+     #d = str(set(a) & set(b))
+     if d == []:
+        d=""
+    
+     return d
+
+nt = ("st","pt","pd","ab","at")
+gn = ("unigram","bigram","trigram","fourgram","biterm","triterm")
+
+
+
+from sklearn.feature_extraction.text import TfidfTransformer, TfidfVectorizer
+from scipy.sparse import csr_matrix
+
+#calculate interssection between gramm and terms
+for i in range(0,5):
+    for t in range(i+1,5):
+        for j in range(0,6):#6):
+            if j<=3:
+                print (nt[i])+'_'+(nt[t])+'_'+(gn[j])+'_intersept'
+                df_all[(nt[i])+'_'+(nt[t])+'_'+(gn[j])+'_intersept'] = [intersect2(x,y) for x,y in zip(df_all[(nt[i])+'_'+(gn[j])],df_all[(nt[t])+'_'+(gn[j])])]
+                #vectorizer_tmp =  TfidfVectorizer(stop_words='english',max_df=0.5)
+                #features = vectorizer_tmp.fit_transform(list(set(list(df_all[(nt[t])+'_'+(gn[j])]))))
+                #tfidf = vectorizer_tmp.transform(df_all[(nt[i])+'_'+(nt[t])+'_'+(gn[j])+'_intersept'])
+        
+                #uno_title=np.ones((len(vectorizer_tmp.get_feature_names()),1)) 
+                #df_all[(nt[i])+'_'+(nt[t])+'_'+(gn[j])+'_tfidf'] = tfidf.tocsr().dot(uno_title)
+            else:
+                if t<2:
+                    print (nt[i])+'_'+(nt[t])+'_'+(gn[j])+'_intersept'
+                    df_all[(nt[i])+'_'+(nt[t])+'_'+(gn[j])+'_intersept'] = [intersect2(x,y) for x,y in zip(df_all[(nt[i])+'_'+(gn[j])],df_all[(nt[t])+'_'+(gn[j])])]
+                    #vectorizer_tmp =  TfidfVectorizer(stop_words='english',max_df=0.5)
+                    #features = vectorizer_tmp.fit_transform(list(set(list(df_all[(nt[t])+'_'+(gn[j])]))))
+                    #tfidf = vectorizer_tmp.transform(df_all[(nt[i])+'_'+(nt[t])+'_'+(gn[j])+'_intersept'])
+        
+                    #uno_title=np.ones((len(vectorizer_tmp.get_feature_names()),1)) 
+                    #df_all[(nt[i])+'_'+(nt[t])+'_'+(gn[j])+'_tfidf'] = tfidf.tocsr().dot(uno_title)
+
+
+#reaplce nan
+def replace_nan(s):
+        s=str(s)
+        if pd.isnull(s)==True:
+                s=""
+        return s
+
+for i in range(25,len(df_all.keys())):
+    print  df_all.ix[:,i][0:1]
+    df_all.ix[:,i] = df_all.ix[:,i].map(lambda x:replace_nan(x))
+    #df_all.ix[:,i] = df_all.ix[:,i].map(lambda x:splitter(x))
+    print  df_all.ix[:,i][0:1]
+    print i
+
+
+#calcualte tfidf between instersection
+t0 = time()
+for i in range(0,5):
+    for t in range(i+1,5):
+        for j in range(0,6):#6):
+            t0 = time()
+            if j<=3:
+                print (nt[i])+'_'+(nt[t])+'_'+(gn[j])+'_intersept'
+                #df_all[(nt[i])+'_'+(nt[t])+'_'+(gn[j])+'_intersept'] = [intersect2(x,y) for x,y in zip(df_all[(nt[i])+'_'+(gn[j])],df_all[(nt[t])+'_'+(gn[j])])]
+                vectorizer_tmp =  TfidfVectorizer(stop_words='english',max_df=0.5)
+                #features = vectorizer_tmp.fit_transform(list(set(list(df_all[(nt[t])+'_'+(gn[j])]  ))))
+                features = vectorizer_tmp.fit_transform(list(set(df_all[(nt[t])+'_'+(gn[j])]  )))
+                tfidf = vectorizer_tmp.transform(df_all[(nt[i])+'_'+(nt[t])+'_'+(gn[j])+'_intersept'])
+        
+                uno_title=np.ones((len(vectorizer_tmp.get_feature_names()),1)) 
+                df_all[(nt[i])+'_'+(nt[t])+'_'+(gn[j])+'_tfidf'] = tfidf.tocsr().dot(uno_title)
+                print 'replace time:',round(time()-t0,3) ,'s\n'
+            else:
+                if t<2:
+                    print (nt[i])+'_'+(nt[t])+'_'+(gn[j])+'_intersept'
+                    #df_all[(nt[i])+'_'+(nt[t])+'_'+(gn[j])+'_intersept'] = [intersect2(x,y) for x,y in zip(df_all[(nt[i])+'_'+(gn[j])],df_all[(nt[t])+'_'+(gn[j])])]
+                    vectorizer_tmp =  TfidfVectorizer(stop_words='english',max_df=0.5)
+                    #features = vectorizer_tmp.fit_transform(list(set(list(df_all[(nt[t])+'_'+(gn[j])]))))
+                    features = vectorizer_tmp.fit_transform(list(set(df_all[(nt[t])+'_'+(gn[j])]  )))
+                    tfidf = vectorizer_tmp.transform(df_all[(nt[i])+'_'+(nt[t])+'_'+(gn[j])+'_intersept'])
+        
+                    uno_title=np.ones((len(vectorizer_tmp.get_feature_names()),1)) 
+                    df_all[(nt[i])+'_'+(nt[t])+'_'+(gn[j])+'_tfidf'] = tfidf.tocsr().dot(uno_title)
+                    print 'replace time:',round(time()-t0,3) ,'s\n'
+
+
+#save features
+b=df_all[df_all.keys()[67:len(df_all.keys())]]
+b["id"]=df_all["id"]
+b.to_csv(FEATURES_DIR+"/df_tfidf_intersept_new.csv", index=False, encoding="utf-8")
+df_all=df_all.drop(df_all.keys()[25:len(df_all.keys())],axis=1)  
+
+
+########################
+######dist_features
+#######################
+
+#dist functions
+def try_divide(x, y, val=0.0):
+    """ 
+    	Try to divide two numbers
+    """
+    if y != 0.0:
+    	val = float(x) / y
+    return val
+
+def JaccardCoef(A, B):
+    #A = preprocess_data(A)
+    #B = preprocess_data(B)
+    A, B = set(A), set(B)
+    intersect = len(A.intersection(B))
+    union = len(A.union(B))
+    coef = try_divide(intersect, union)
+    return coef
+
+def DiceDist(A, B):
+    #A = preprocess_data(A)
+    #B = preprocess_data(B)
+    A, B = set(A), set(B)
+    intersect = len(A.intersection(B))
+    union = len(A) + len(B)
+    d = try_divide(2*intersect, union)
+    return d
+
+def compute_dist(A, B, dist="jaccard_coef"):
+    if dist == "jaccard_coef":
+        d = JaccardCoef(A, B)
+    elif dist == "dice_dist":
+        d = DiceDist(A, B)
+    return d
+
+
+token_pattern = r"(?u)\b\w\w+\b"
+
+def preprocess_data(line, token_pattern=token_pattern,                     
+                     encode_digit=False):
+    line=str(line)
+    token_pattern = re.compile(token_pattern, flags = re.UNICODE | re.LOCALE)
+    tokens = [x.lower() for x in token_pattern.findall(line)]  
+    return tokens
+
+
+#caluclate dist features
+ 
+dists = "dice_dist"
+
+
+
+t0 = time()
+df_all['st_pt__unigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_unigram'], x['pt_unigram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_pd__unigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_unigram'], x['pd_unigram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_at__unigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_unigram'], x['at_unigram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_pd__unigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_unigram'], x['pd_unigram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_at__unigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_unigram'], x['at_unigram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pd_at__unigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pd_unigram'], x['at_unigram'] ,dists), axis=1))
+
+print 'unigram time:',round(time()-t0,3) ,'s\n'
+
+
+t0 = time()
+df_all['st_pt__bigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_bigram'], x['pt_bigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_pd__bigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_bigram'], x['pd_bigram'] ), axis=1))
+print 'time:'
