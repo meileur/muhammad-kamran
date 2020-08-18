@@ -532,4 +532,147 @@ t0 = time()
 df_all['st_pt__bigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_bigram'], x['pt_bigram'] ), axis=1))
 print 'time:',round(time()-t0,3) ,'s\n'
 df_all['st_pd__bigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_bigram'], x['pd_bigram'] ), axis=1))
-print 'time:'
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_at__bigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_bigram'], x['at_bigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_pd__bigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_bigram'], x['pd_bigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_at__bigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_bigram'], x['at_bigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pd_at__bigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pd_bigram'], x['at_bigram'] ), axis=1))
+
+print 'bigram time:',round(time()-t0,3) ,'s\n'
+
+
+t0 = time()
+df_all['st_pt__trigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_trigram'], x['pt_trigram'] ,dists ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_pd__trigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_trigram'], x['pd_trigram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_at__trigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_trigram'], x['at_trigram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_pd__trigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_trigram'], x['pd_trigram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_at__trigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_trigram'], x['at_trigram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pd_at__trigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pd_trigram'], x['at_trigram'] ,dists), axis=1))
+
+print 'trigram time:',round(time()-t0,3) ,'s\n'
+
+
+t0 = time()
+df_all['st_pt__fourgram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_fourgram'], x['pt_fourgram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_pd__fourgram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_fourgram'], x['pd_fourgram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_at__fourgram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_fourgram'], x['at_fourgram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_pd__fourgram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_fourgram'], x['pd_fourgram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_at__fourgram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_fourgram'], x['at_fourgram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pd_at__fourgram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pd_fourgram'], x['at_fourgram'] ), axis=1))
+
+print 'fourgram time:',round(time()-t0,3) ,'s\n'
+
+t0 = time()
+df_all['st_pt__biterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_biterm'], x['pt_biterm'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_pd__biterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_biterm'], x['pd_bigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_at__biterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_biterm'], x['at_bigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_pd__biterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_biterm'], x['pd_bigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_at__biterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_biterm'], x['at_bigram'] ), axis=1))
+
+
+print 'biterm time:',round(time()-t0,3) ,'s\n'
+
+t0 = time()
+df_all['st_pt__triterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_triterm'], x['pt_triterm'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_pd__triterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_triterm'], x['pd_trigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_at__triterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_triterm'], x['at_trigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_pd__triterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_triterm'], x['pd_trigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_at__triterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_triterm'], x['at_trigram'] ), axis=1))
+
+
+print 'triterm time:',round(time()-t0,3) ,'s\n'
+
+
+
+dists = "jaccard_coef"
+
+
+t0 = time()
+df_all['st_pt__unigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_unigram'], x['pt_unigram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_pd__unigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_unigram'], x['pd_unigram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_at__unigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_unigram'], x['at_unigram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_pd__unigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_unigram'], x['pd_unigram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_at__unigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_unigram'], x['at_unigram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pd_at__unigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pd_unigram'], x['at_unigram'] ,dists), axis=1))
+
+print 'unigram time:',round(time()-t0,3) ,'s\n'
+
+
+t0 = time()
+df_all['st_pt__bigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_bigram'], x['pt_bigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_pd__bigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_bigram'], x['pd_bigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_at__bigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_bigram'], x['at_bigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_pd__bigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_bigram'], x['pd_bigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_at__bigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_bigram'], x['at_bigram'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pd_at__bigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pd_bigram'], x['at_bigram'] ), axis=1))
+
+print 'bigram time:',round(time()-t0,3) ,'s\n'
+
+
+t0 = time()
+df_all['st_pt__trigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_trigram'], x['pt_trigram'] ,dists ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_pd__trigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_trigram'], x['pd_trigram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_at__trigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_trigram'], x['at_trigram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_pd__trigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_trigram'], x['pd_trigram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_at__trigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_trigram'], x['at_trigram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pd_at__trigram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pd_trigram'], x['at_trigram'] ,dists), axis=1))
+
+print 'trigram time:',round(time()-t0,3) ,'s\n'
+
+
+t0 = time()
+df_all['st_pt__fourgram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_fourgram'], x['pt_fourgram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_pd__fourgram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_fourgram'], x['pd_fourgram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_at__fourgram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_fourgram'], x['at_fourgram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_pd__fourgram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_fourgram'], x['pd_fourgram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pt_at__fourgram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pt_fourgram'], x['at_fourgram'] ,dists), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['pd_at__fourgram_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['pd_fourgram'], x['at_fourgram'] ), axis=1))
+
+print 'fourgram time:',round(time()-t0,3) ,'s\n'
+
+t0 = time()
+df_all['st_pt__biterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_biterm'], x['pt_biterm'] ), axis=1))
+print 'time:',round(time()-t0,3) ,'s\n'
+df_all['st_pd__biterm_'+(dists)]=list(df_all.apply(lambda x : compute_dist(x['st_biterm'], x['pd_bigram'] ), axis=1))
+print 'time:',round(time()-
