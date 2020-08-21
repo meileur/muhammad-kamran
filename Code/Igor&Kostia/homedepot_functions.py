@@ -174,4 +174,220 @@ def spell_correction(s, automatic_spell_check_dict={}):
             s=s.replace("a/c","ac")
 
    
-    external_data_dict={'airvents': 'air vents
+    external_data_dict={'airvents': 'air vents', 
+    'antivibration': 'anti vibration', 
+    'autofeeder': 'auto feeder', 
+    'backbrace': 'back brace', 
+    'behroil': 'behr oil', 
+    'behrwooden': 'behr wooden', 
+    'brownswitch': 'brown switch', 
+    'byefold': 'bifold', 
+    'canapu': 'canopy', 
+    'cleanerakline': 'cleaner alkaline',
+    'colared': 'colored', 
+    'comercialcarpet': 'commercial carpet', 
+    'dcon': 'd con', 
+    'doorsmoocher': 'door smoocher', 
+    'dreme': 'dremel', 
+    'ecobulb': 'eco bulb', 
+    'fantdoors': 'fan doors', 
+    'gallondrywall': 'gallon drywall', 
+    'geotextile': 'geo textile', 
+    'hallodoor': 'hallo door', 
+    'heatgasget': 'heat gasket', 
+    'ilumination': 'illumination', 
+    'insol': 'insulation', 
+    'instock': 'in stock', 
+    'joisthangers': 'joist hangers', 
+    'kalkey': 'kelkay', 
+    'kohlerdrop': 'kohler drop', 
+    'kti': 'kit', 
+    'laminet': 'laminate', 
+    'mandoors': 'main doors', 
+    'mountspacesaver': 'mount space saver', 
+    'reffridge': 'refrigerator', 
+    'refrig': 'refrigerator', 
+    'reliabilt': 'reliability', 
+    'replaclacemt': 'replacement', 
+    'searchgalvanized': 'search galvanized', 
+    'seedeater': 'seed eater', 
+    'showerstorage': 'shower storage', 
+    'straitline': 'straight line', 
+    'subpumps': 'sub pumps', 
+    'thromastate': 'thermostat', 
+    'topsealer': 'top sealer', 
+    'underlay': 'underlayment',
+    'vdk': 'bdk', 
+    'wallprimer': 'wall primer', 
+    'weedbgon': 'weed b gon', 
+    'weedeaters': 'weed eaters', 
+    'weedwacker': 'weed wacker', 
+    'wesleyspruce': 'wesley spruce', 
+    'worklite': 'work light'}
+         
+    for word in external_data_dict.keys():
+        s=re.sub(r'\b'+word+r'\b',external_data_dict[word], s)
+        
+    ############ replace words from dict
+    for word in automatic_spell_check_dict.keys():
+        s=re.sub(r'\b'+word+r'\b',automatic_spell_check_dict[word], s)
+   
+    return s
+
+"""
+The following function contains some replacement to be made in all text (not only search terms).
+Most of the replacements are not shared on the forum because they are thesaurus replacements, not spell correction.
+"""
+def replace_in_parser(s):
+    #the first three shared on forum
+    s=s.replace("acccessories","accessories")
+    s = re.sub(r'\bscott\b', 'scotts', s) #brand
+    s = re.sub(r'\borgainzer\b', 'organizer', s)
+    
+    # the others are not shared
+    s = re.sub(r'\aluminuum\b', 'aluminum', s)    
+    s = re.sub(r'\bgeneral electric','ge', s)
+    s = s.replace("adaptor","adapter")
+    s = re.sub(r'\bfibre', 'fiber', s)
+    s = re.sub(r'\bbuilt in\b', 'builtin',s)
+    s = re.sub(r'\bshark bite\b', 'sharkbite',s)
+    s = re.sub('barbeque', 'barbecue',s)
+    s = re.sub(r'\bbbq\b', 'barbecue', s)
+    s = re.sub(r'\bbathroom[s]*\b', 'bath', s)
+    s = re.sub(r'\bberkeley\b', 'berkley', s)
+    s = re.sub(r'\bbookshelves\b', 'book shelf', s)
+    s = re.sub(r'\bbookshelf\b', 'book shelf', s)
+    s = re.sub(r'\bin line ', ' inline ', s)
+    s = re.sub(r'round up\b', ' roundup', s)
+    s = re.sub(r'\blg electronics\b', 'lg', s)
+    s = re.sub(r'\bhdtv\b', 'hd tv', s)
+    s = re.sub(r'black [and ]*decker', 'black and decker', s)
+    s = re.sub(r'backer board[s]*', 'backerboard', s)
+    s = re.sub(r'\bphillips\b', 'philips', s)
+    s = re.sub(r'\bshower head[s]*\b', 'showerhead', s)
+    s = re.sub(r'\bbull nose\b', 'bullnose', s)
+    s = re.sub(r'\bflood light\b', 'floodlight', s)
+    s = re.sub(r'\barrester\b', 'arrestor', s)
+    s = re.sub(r'\bbi fold\b', 'bifold', s)
+    s = re.sub(r'\bfirepit[s]*\b', 'fire pit', s)
+    s = re.sub(r'\bbed bug[s]*\b', 'bedbug', s)
+    s = re.sub(r'\bhook up[s]*\b', 'hookup', s)
+    s = re.sub(r'\bjig saw[s]*\b', 'jigsaw', s)
+    s = re.sub(r'\bspacesav(?=er[s]*|ing)', 'space sav', s)
+    s = re.sub(r'\bwall paper', 'wallpaper', s)
+    s = re.sub(r'\bphotocell', 'photo cells', s)
+    s = re.sub(r'\bplasti dip\b', 'plastidip', s)
+    s = re.sub(r'\bflexi dip\b', 'flexidip', s)  
+    s = re.sub(r'\bback splash','backsplash', s)
+    s = re.sub(r'\bbarstool(?=\b|s)','bar stool', s)
+    s = re.sub(r'\blampholder(?=\b|s)','lamp holder', s)
+    s = re.sub(r'\brainsuit(?=\b|s)','rain suit', s)
+    s = re.sub(r'\bback up\b','backup', s)
+    s = re.sub(r'\bwheel barrow', 'wheelbarrow', s)
+    s=re.sub(r'\bsaw horse', 'sawhorse',s)
+    s=re.sub(r'\bscrew driver', 'screwdriver',s)
+    s=re.sub(r'\bnut driver', 'nutdriver',s)
+    s=re.sub(r'\bflushmount', 'flush mount',s)
+    s=re.sub(r'\bcooktop(?=\b|s\b)', 'cook top',s)
+    s=re.sub(r'\bcounter top(?=s|\b)','countertop', s)    
+    s=re.sub(r'\bbacksplash', 'back splash',s)
+    s=re.sub(r'\bhandleset', 'handle set',s)
+    s=re.sub(r'\bplayset', 'play set',s)
+    s=re.sub(r'\bsidesplash', 'side splash',s)
+    s=re.sub(r'\bdownlight', 'down light',s)
+    s=re.sub(r'\bbackerboard', 'backer board',s)
+    s=re.sub(r'\bshoplight', 'shop light',s)
+    s=re.sub(r'\bdownspout', 'down spout',s)
+    s=re.sub(r'\bpowerhead', 'power head',s)
+    s=re.sub(r'\bnightstand', 'night stand',s)
+    s=re.sub(r'\bmicro fiber[s]*\b', 'microfiber', s)
+    s=re.sub(r'\bworklight', 'work light',s)
+    s=re.sub(r'\blockset', 'lock set',s)
+    s=re.sub(r'\bslatwall', 'slat wall',s)
+    s=re.sub(r'\btileboard', 'tile board',s)
+    s=re.sub(r'\bmoulding', 'molding',s)
+    s=re.sub(r'\bdoorstop', 'door stop',s)
+    s=re.sub(r'\bwork bench\b','workbench', s)
+    s=re.sub(r'\bweed[\ ]*eater','weed trimmer', s)
+    s=re.sub(r'\bweed[\ ]*w[h]*acker','weed trimmer', s)
+    s=re.sub(r'\bnightlight(?=\b|s)','night light', s)
+    s=re.sub(r'\bheadlamp(?=\b|s)','head lamp', s)
+    s=re.sub(r'\bfiber board','fiberboard', s)
+    s=re.sub(r'\bmail box','mailbox', s)
+    
+    replace_material_dict={'aluminium': 'aluminum', 
+    'medium density fiberboard': 'mdf',
+    'high density fiberboard': 'hdf',
+    'fiber reinforced polymer': 'frp',
+    'cross linked polyethylene': 'pex',
+    'poly vinyl chloride': 'pvc', 
+    'thermoplastic rubber': 'tpr', 
+    'poly lactic acid': 'pla', 
+    'acrylonitrile butadiene styrene': 'abs',
+    'chlorinated poly vinyl chloride': 'cpvc'}
+    for word in replace_material_dict.keys():
+        if word in s:
+            s = s.replace(word, replace_material_dict[word])
+    
+    return s
+
+
+"""
+The following function used to process the all text fields
+"""
+def str_parser(s, automatic_spell_check_dict={}, remove_from_brackets=False,parse_material=False,add_space_stop_list=[]):
+    #the following three replacements are shared on the forum    
+    s = s.replace("craftsm,an","craftsman")        
+    s = re.sub(r'depot.com/search=', '', s)
+    s = re.sub(r'pilers,needlenose', 'pliers, needle nose', s)
+    
+    s = re.sub(r'\bmr.', 'mr ', s)
+    s = re.sub(r'&amp;', '&', s)
+    s = re.sub('&nbsp;', '', s)
+    s = re.sub('&#39;', '', s)
+    s = re.sub(r'(?<=[0-9]),[\ ]*(?=[0-9])', '', s)
+    s = s.replace(";",".")
+    s = s.replace(",",".")
+    s = s.replace(":",". ")
+    s = s.replace("+"," ")
+    s = re.sub(r'\bU.S.', 'US ', s)
+    s = s.replace(" W x "," ")
+    s = s.replace(" H x "," ")
+    s = re.sub(' [\#]\d+[\-\d]*[\,]*', '', s)    
+    s = re.sub('(?<=[0-9\%])(?=[A-Z][a-z])', '. ', s) # add dot between number and cap letter
+    s = re.sub(r'(?<=\))(?=[a-zA-Z0-9])', ' ', s) # add space between parentheses and letters
+    s = re.sub(r'(?<=[a-zA-Z0-9])(?=\()', ' ', s) # add space between parentheses and letters
+
+    if parse_material:
+        replace_dict={'Medium Density Fiberboard (MDF)':'mdf', 'High Density Fiberboard (HDF)':'hdf',\
+        'Fibre Reinforced Polymer (FRP)': 'frp', 'Acrylonitrile Butadiene Styrene (ABS)': 'abs',\
+        'Cross-Linked Polyethylene (PEX)':'pex', 'Chlorinated Poly Vinyl Chloride (CPVC)': 'cpvc',\
+        'PVC (vinyl)': 'pvc','Thermoplastic rubber (TPR)':'tpr','Poly Lactic Acid (PLA)': 'pla',\
+        '100% Polyester':'polyester','100% UV Olefin':'olefin', '100% BCF Polypropylene': 'polypropylene',\
+        '100% PVC':'pvc'}
+        
+        if s in replace_dict.keys():
+            s=replace_dict[s]
+
+
+    s = re.sub('[^a-zA-Z0-9\n\ \%\$\-\#\@\&\/\.\'\*\(\)]', ' ', s)
+    s= " ".join(s.split())
+
+    s=s.replace("-"," ")
+    
+    if len(add_space_stop_list)>0:
+        s = " ".join([re.sub('(?<=[a-z])(?=[A-Z][a-z\ ])', '. ', word)  if word.lower() not in add_space_stop_list else word for word in s.split()])
+
+    s=s.lower() 
+    s = re.sub('\.(?=[a-z])', '. ', s) #dots before words -> replace with spaces
+   # s = re.sub('(?<=[a-z])(?=[A-Z][a-z\ ])', ' ', s) # add space if uppercase after lowercase
+    s = re.sub('(?<=[a-z][a-z][a-z])(?=[0-9])', ' ', s) # add cpase if number after at least three letters
+    ##s = re.sub('(?<=[a-zA-Z])\.(?=\ |$)', '', s) #remove dots at the end of string
+    #s = re.sub('(?<=[0-9])\.(?=\ |$)', '', s) # dot after digit before space
+    s = re.sub('^\.\ ', '', s) #dot at the beginning before space
+    
+
+    if len(automatic_spell_check_dict.keys())>0:
+        s=spell_correction(s,automatic_spell_check_dict=automatic_spell_check_dict)
+    
+    if remove_from_brackets==True:
