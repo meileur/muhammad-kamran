@@ -600,4 +600,253 @@ def find_similarity(w1,w2, nouns=True,CUT_VALUE=14.50):
         max_lch_similarity=max(lch_similarities_list)
         mean_lch_similarity=np.mean(lch_similarities_list)
         
-    res_similarities_list=[min(CUT_VALUE,item1.res_similarity(item
+    res_similarities_list=[min(CUT_VALUE,item1.res_similarity(item2,brown_ic))  for item1 in lst1 \
+                                for  item2 in lst2 \
+                                if item1.pos() not in ['a','s','r'] and item1.pos()==item2.pos() and item1.res_similarity(item2,brown_ic)!=None]  
+
+    if len(res_similarities_list)==0:
+        max_res_similarity=0
+        mean_res_similarity=0
+    else:
+        max_res_similarity=max(res_similarities_list)
+        mean_res_similarity=np.mean(res_similarities_list)
+        
+    return max_similarity, mean_similarity, max_lch_similarity, mean_lch_similarity, max_res_similarity, mean_res_similarity
+     
+
+
+"""
+The function that return a bundle of count features for the pair of strings:
+- number of unique words in intersection
+- number of total words in intersection
+- number of letters in unique words in intersection
+- ratio of common words to all words in str1 (query)
+- ratio of the number of letters in common words to the total number of letters in str1 (query)
+Also, the common words are returned as a string.
+Example:
+str1 = "table with cover"
+str2 = "wood cover"
+the function returns (1, 1, 5, 0.3333333333333333, 0.35714285714285715, 'cover')
+"""     
+     
+def str_common_word(str1, str2, minLength=1, string_only=False):
+    word_list=[]
+    num=0
+    total_entries=0
+    cnt_letters=0
+    cnt_unique_letters=0
+    all_num=0
+    all_total_entries=0
+    all_cnt_letters=0
+    for word in str1.split():
+         if len(word)>=minLength:
+             if string_only==False or len(re.findall(r'\d+', word))==0:
+                 if (' '+word+' ') in (' '+str2+' '):
+                     num+=1
+                     total_entries+=(' '+str2+' ').count(' '+word+' ')
+                     cnt_letters+=(' '+str2+' ').count(' '+word+' ') * (len(word))
+                     cnt_unique_letters+=(len(word))
+                     word_list.append(word)
+                 all_num+=1
+                 all_total_entries+=1
+                 all_cnt_letters+=len(word)
+    
+    if all_num==0:
+        ratio_num=0
+    else:
+        ratio_num=1.0*num/all_num
+    
+    if all_cnt_letters==0:
+        ratio_letters=0
+    else:
+        ratio_letters=1.0*cnt_unique_letters/all_cnt_letters
+                 
+    return num, total_entries, cnt_unique_letters, ratio_num, ratio_letters, " ".join(word_list)
+
+
+    
+"""
+Calculating jaccard coefficients for the two input strings.
+Also, similar coefficients but for the number of letters are returned.
+"""    
+#################
+def str_jaccard(str1, str2, minLength=1, string_only=False):
+    num=0
+    total_entries=0
+    cnt_letters=0
+    cnt_unique_letters=0
+    str1_num=0
+    str1_cnt_letters=0
+    str2_num=len(str2.split())
+    str2_cnt_letters= sum([len(word) for word in str2.split()])
+    for word in str1.split():
+         if len(word)>=minLength:
+             if string_only==False or len(re.findall(r'\d+', word))==0:
+                 if (' '+word+' ') in (' '+str2+' '):
+                     num+=1
+                     cnt_letters+=(' '+str2+' ').count(' '+word+' ') * (len(word))
+                     cnt_unique_letters+=(len(word))
+                 str1_num+=1
+                 str2_cnt_letters+=len(word)
+    
+    if (str1_num+str2_num)==0:
+        jaccard=0
+        jaccard_letters=0
+    else:
+        jaccard=1.0*num/(str1_num+str2_num-num)
+        jaccard_letters=1.0*cnt_unique_letters/(str1_cnt_letters+str2_cnt_letters-cnt_unique_letters)
+                     
+    return jaccard, jaccard_letters
+
+
+"""
+Similar to str_common_words(), but this function process word pairs.
+"""
+def str_2common_words(str1, str2, string_only=False):
+    #str1=" ".join([word for word in str1.split() if word not in stoplist])
+    #str2=" ".join([word for word in str2.split() if word not in stoplist])
+    num=0
+    total_entries=0
+    cnt_letters=0
+    cnt_unique_letters=0
+    words_in_query=str1.split()
+    for cnt in range(0,len(words_in_query)-1):
+        two_words=words_in_query[cnt]+' '+words_in_query[cnt+1]
+        if string_only==False or len(re.findall(r'\d+', two_words))==0:
+            if (' '+two_words+' ') in (' '+str2+' ')>=0:
+                num+=1
+                total_entries+=(' '+str2+' ').count(' '+two_words+' ')
+                cnt_letters+=(' '+str2+' ').count(' '+two_words+' ') * (len(two_words)-1)
+                cnt_unique_letters+=(len(two_words)-1)
+    return num, total_entries, cnt_unique_letters
+
+"""
+Returns 1 if str1 (query) is found in str2, 0 otherwise.
+"""    
+def query_in_text(str1, str2):
+     output=0
+     if len(str1.split())>0:
+         if str1 in str2:
+             if re.search(r'\b'+str1+r'\b',str2)!=None:
+                 output=1
+     return output
+   
+   
+"""
+Similar to str_common_words(), but designed specifically for digits.
+"""
+def str_common_digits(str1, str2):
+        found=0
+        found_words_only=0
+        digits_in_query=list(set(re.findall(r'\d+\/\d+|\d+\.\d+|\d+', str1)))
+        digits_in_text=re.findall(r'\d+\/\d+|\d+\.\d+|\d+', str2)
+        len1=len(digits_in_query)
+        len2=len(digits_in_text)
+        for digit in digits_in_query:
+                if digit in digits_in_text:
+                        found+=1
+                        
+        if len1==0:
+            ratio=0.
+        else:
+            ratio=found/len1
+        
+        if (len1 + len2)==0:
+            jaccard=0.
+        else:
+            jaccard=1.0*found/(len1 + len2)
+        return len1, len2, found, ratio, jaccard
+
+
+
+"""
+Return ratio and scaled ratio from difflib.SequenceMatcher()
+"""
+def seq_matcher(s1,s2):
+    seq=difflib.SequenceMatcher(None, s1,s2)
+    rt=round(seq.ratio(),7)
+    l1=len(s1)
+    l2=len(s2)
+    if len(s1)==0 or len(s2)==0:
+        rt=0
+        rt_scaled=0
+    else:
+        rt_scaled=round(rt*max(l1,l2)/min(l1,l2),7)
+    return rt, rt_scaled
+    
+
+
+"""
+Deletes all words (I mean char sequences) that contain digits
+"""
+def words_wo_digits(s, minLength=2):
+    words=s.split()
+    for word in s.split():
+        if len(re.findall(r'\d+', word))!=0 or len(word)<minLength:
+            words.remove(word)
+    return " ".join([word for word in words])
+
+
+"""
+This is used to recover information about word tags 
+that was produced by NLTK.pos_tagger() and then transformed to string 
+(for example, after saving to a file)
+"""
+def parser_mystr2tuple(s,minLength=1):
+    output_list=[]    
+    if len(s)>4:
+        s=s.replace("(u'","('")
+        s=s[2:len(s)-2]
+        s=s.replace("'","")
+        lst=s.split("), (")
+    
+        for i in range(0,len(lst)):
+            word, tag = lst[i].split(", ")
+            if len(word)>=minLength or tag=='CD':
+                output_list.append(nltk.str2tuple(word+"/"+tag))
+    return output_list
+
+
+"""
+The function gets the list of tagged words and returns "important" nouns.
+Noun is "important" if it is the last in the series of nouns (the series can be of length 1).
+"""
+def nn_important_words(my_token_string):
+    my_token_list=parser_mystr2tuple(my_token_string,minLength=1)
+    output_list=[]
+    for i in range(0,len(my_token_list)):
+        if my_token_list[i][1].find('NN')>=0 and len(re.findall(r'\d+', my_token_list[i][0]))==0: # or my_token_list[i][1]=="VBG":
+            if i==(len(my_token_list)-1) or (my_token_list[i+1][1].find('NN')<0) or (my_token_list[i+1][1].find('NN')>=0 and len(re.findall(r'\d+', my_token_list[i+1][0]))>0 ): # and my_token_list[i+1][1]!="VBG"):
+                output_list.append(my_token_list[i][0])
+    return " ".join(output_list)
+
+
+"""
+The function gets the list of tagged words and returns "not important" nouns.
+Noun is "not important" if it is not the last in the series of nouns.
+"""  
+def nn_unimportant_words(my_token_string):
+    my_token_list=parser_mystr2tuple(my_token_string,minLength=1)
+    output_list=[]
+    for i in range(0,len(my_token_list)):
+        if my_token_list[i][1].find('NN')>=0 and len(re.findall(r'\d+', my_token_list[i][0]))==0: # or my_token_list[i][1]=="VBG": 
+            ## this is commented to add only nouns (not gerunds) to the lists
+            if i==(len(my_token_list)-1) or (my_token_list[i+1][1].find('NN')<0) or (my_token_list[i+1][1].find('NN')>=0 and len(re.findall(r'\d+', my_token_list[i+1][0]))>0 ): # and my_token_list[i+1][1]!="VBG"):
+                1+1
+            else:
+                output_list.append(my_token_list[i][0])
+    return " ".join(output_list)
+    
+
+#The function gets the list of tagged words and returns verbs. 
+def vb_words(my_token_string):
+    my_token_list=parser_mystr2tuple(my_token_string,minLength=1)
+    output_list=[]
+    for i in range(0,len(my_token_list)):
+        if my_token_list[i][1].find('VB')>=0 and my_token_list[i][1]!="VBG":
+            output_list.append(my_token_list[i][0])
+    return " ".join(output_list)
+
+#The function gets the list of tagged words and returns gerunds (i.e. with tag 'VBG'). 
+def vbg_words(my_token_string):
+    my_token_l
