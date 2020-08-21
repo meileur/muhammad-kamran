@@ -391,3 +391,213 @@ def str_parser(s, automatic_spell_check_dict={}, remove_from_brackets=False,pars
         s=spell_correction(s,automatic_spell_check_dict=automatic_spell_check_dict)
     
     if remove_from_brackets==True:
+        s = re.sub('(?<=\()[a-zA-Z0-9\n\ \%\$\-\#\@\&\/\.\'\*\(\)]*(?=\))', '', s)
+    else:
+        s=s.replace(" (",". ")
+        s=re.sub('(?<=[a-zA-Z0-9\%\$])\(', '. ', s)
+        s=s.replace(" )",". ")
+        s=s.replace(")",". ")
+        s=s.replace("  "," ")
+        s = re.sub('\ \.', '\.', s)
+        
+
+    #######s = re.sub('(?<=[0-9\%])(?=[a-wyz])', ' ', s) # add space between number and text (except letter x) 
+    #s = re.sub('(?<=[a-zA-Z])-(?=[a-zA-Z])', ' ', s) # replace '-' in words with space
+    s=s.replace("at&t","att")
+    s=s.replace("&"," and ")    
+    s=s.replace("*"," x ")
+    s = re.sub('(?<=[a-z\ ])\/(?=[a-z\ ])', ' ', s) # replace "/" between words with space
+    s = re.sub('(?<=[a-z])\\\\(?=[a-z])', ' ', s) # replace "/" between words with space
+    s=s.replace("  "," ")
+    s=s.replace("  "," ")
+    
+    #s=re.sub('(?<=\ [a-ux-z])\ (?=[0-9])', '', s)   #remove spaces
+    #s=re.sub('(?<=^[a-z])\ (?=[0-9])', '', s)   #remove spaces
+
+
+
+
+    #####################################
+    ### thesaurus replacement in all vars
+    s=replace_in_parser(s)
+    
+    s = re.sub('half(?=\ inch)', '1/2', s)
+    s = re.sub('\ba half\b', '1/2', s)
+    #s = re.sub('half\ ', 'half-', s)
+
+    s = re.sub(r'(?<=\')s\b', '', s)
+    s = re.sub('(?<=[0-9])\'\'', ' in ', s)
+    s = re.sub('(?<=[0-9])\'', ' in ', s)
+
+    s = re.sub(r'(?<=[0-9])[\ ]*inch[es]*\b', '-in ', s)
+    s = re.sub(r'(?<=[0-9])[\ ]*in\b', '-in ', s)
+    
+    s = re.sub(r'(?<=[0-9])[\-|\ ]*feet[s]*\b', '-ft ', s)
+    s = re.sub(r'(?<=[0-9])[\ ]*foot[s]*\b', '-ft ', s)
+    s = re.sub(r'(?<=[0-9])[\ ]*ft[x]*\b', '-ft ', s)
+    
+    s = re.sub('(?<=[0-9])[\ ]*volt[s]*(?=\ |$|\.)', '-V ', s)
+    s = re.sub('(?<=[0-9])[\ ]*v(?=\ |$|\.)', '-V ', s)
+    
+    s = re.sub('(?<=[0-9])[\ ]*wat[t]*[s]*(?=\ |$|\.)', '-W ', s)
+    s = re.sub('(?<=[0-9])[\ ]*w(?=\ |$|\.)', '-W ', s)
+    
+    s = re.sub('(?<=[0-9])[\ ]*kilo[\ ]*watt[s]*(?=\ |$|\.)', '-KW ', s)
+    s = re.sub('(?<=[0-9])[\ ]*kw(?=\ |$|\.)', '-KW ', s)
+    
+    s = re.sub('(?<=[0-9])[\ ]*amp[s]*(?=\ |$|\.)', '-A ', s)
+    #s = re.sub('(?<=[0-9]) a(?=\ |$|\.)', '-A. ', s)
+    s = re.sub('(?<=[0-9])a(?=\ |$|\.)', '-A ', s)
+
+    s = re.sub('(?<=[0-9])[\ ]*gallon[s]*(?=\ |$|\.)', '-gal ', s)
+    s = re.sub('(?<=[0-9])[\ ]*gal(?=\ |$|\.)', '-gal ', s)
+        
+    s = re.sub('(?<=[0-9])[\ ]*pound[s]*(?=\ |$|\.)', '-lb ', s)
+    s = re.sub('(?<=[0-9])[\ ]*lb[s]*(?=\ |$|\.)', '-lb ', s)
+        
+    s = re.sub('(?<=[0-9])[\ ]*mi[l]+imet[er]*[s]*(?=\ |$|\.)', '-mm ', s)
+    s = re.sub('(?<=[0-9])[\ ]*mm(?=\ |$|\.)', '-mm ', s)
+        
+    s = re.sub('(?<=[0-9])[\ ]*centimeter[s]*(?=\ |$|\.)', '-cm ', s)
+    s = re.sub('(?<=[0-9])[\ ]*cm(?=\ |$|\.)', '-cm ', s)
+        
+    s = re.sub('(?<=[0-9])[\ ]*ounce[s]*(?=\ |$|\.)', '-oz ', s)
+    s = re.sub('(?<=[0-9])[\ ]*oz(?=\ |$|\.)', '-oz ', s)
+    
+    s = re.sub('(?<=[0-9])[\ ]*liter[s]*(?=\ |$|\.)', '-L ', s)
+    s = re.sub('(?<=[0-9])[\ ]*litre[s]*(?=\ |$|\.)', '-L ', s)
+    s = re.sub('(?<=[0-9])[\ ]*l(?=\ |$|\.)', '-L. ', s)
+    
+    s = re.sub('(?<=[0-9])[\ ]*square feet[s]*(?=\ |$|\.)', '-sqft ', s)
+    s = re.sub('(?<=[0-9])square feet[s]*(?=\ |$|\.)', '-sqft ', s)
+    s = re.sub('(?<=[0-9])[\ ]*sq[\ |\.|\.\ ]*ft(?=\ |$|\.)', '-sqft ', s)
+    s = re.sub('(?<=[0-9])[\ ]*sq. ft(?=\ |$|\.)', '-sqft', s)
+    s = re.sub('(?<=[0-9])[\ ]*sq.ft(?=\ |$|\.)', '-sqft', s)
+    
+    s = re.sub('(?<=[0-9])[\ ]*cubic f[e]*t[s]*(?=\ |$|\.)', '-cuft ', s)
+    s = re.sub('(?<=[0-9])[\ ]*cu[\ |\.|\.\ ]*ft(?=\ |$|\.)', '-cuft ', s)
+    s = re.sub('(?<=[0-9])[\ ]*cu[\.]*[\ ]*ft(?=\ |$|\.)', '-cuft', s)
+    
+     
+    #remove 'x'
+    s = re.sub('(?<=[0-9]) x (?=[0-9])', '-X ', s)
+    s = re.sub('(?<=[0-9])x (?=[0-9])', '-X ', s)
+    s = re.sub('(?<=[0-9]) x(?=[0-9])', '-X ', s)
+    s = re.sub('(?<=[0-9])x(?=[0-9])', '-X ', s)
+    
+    #s=s.replace("..",".")
+    s=s.replace("\n"," ")
+    s=s.replace("  "," ")
+
+    words=s.split()
+
+    if s.find("-X")>=0:
+        for cnt in range(0,len(words)-1):
+            if words[cnt].find("-X")>=0:
+                if words[cnt+1].find("-X") and cnt<len(words)-2:
+                    cntAdd=2
+                else:
+                    cntAdd=1
+                to_replace=re.search(r'(?<=[0-9]\-)\w+\b',words[cnt+cntAdd])
+                if not (to_replace==None):
+                    words[cnt]=words[cnt].replace("-X","-"+to_replace.group(0)+"")
+                else:
+                    words[cnt]=words[cnt].replace("-X","x")
+    s = " ".join([word for word in words])
+    
+    s = re.sub('[^a-zA-Z0-9\ \%\$\-\@\&\/\.]', '', s) #remove "'" and "\n" and "#" and characters
+    ##s = re.sub('(?<=[a-zA-Z])[\.|\/](?=\ |$)', '', s) #remove dots at the end of string
+    s = re.sub('(?<=[0-9])x(?=\ |$)', '', s) #remove 
+    s = re.sub('(?<=[\ ])x(?=[0-9])', '', s) #remove
+    s = re.sub('(?<=^)x(?=[0-9])', '', s)
+    #s = re.sub('[\ ]\.(?=\ |$)', '', s) #remove dots 
+    s=s.replace("  "," ")
+    s=s.replace("..",".")
+    s = re.sub('\ \.', '', s)
+    
+    s=re.sub('(?<=\ [ch-hj-np-su-z][a-z])\ (?=[0-9])', '', s) #remove spaces
+    s=re.sub('(?<=^[ch-hj-np-su-z][a-z])\ (?=[0-9])', '', s) #remove spaces
+    
+    s = re.sub('(?<=\ )\.(?=[0-9])', '0.', s)
+    s = re.sub('(?<=^)\.(?=[0-9])', '0.', s)
+    return " ".join([word for word in s.split()])
+
+
+
+def cut_punctuation(s):
+    return " ".join([re.sub(r'[;,.](?=$)','', word) for word in s.split()])
+
+### str_stemmer() = stemmer(str_parser())
+def str_stemmer(s, automatic_spell_check_dict={},remove_from_brackets=False,parse_material=False,add_space_stop_list=[], stoplist=stoplist):
+    s=str_parser(s,automatic_spell_check_dict=automatic_spell_check_dict, remove_from_brackets=remove_from_brackets,\
+            parse_material=parse_material, add_space_stop_list=add_space_stop_list)
+    s=" ".join([word for word in s.split() if word not in stoplist])
+    return " ".join([stemmer.stem(re.sub('\.(?=$)', '', word)) for word in s.split()])
+
+def str_stemmer_wo_parser(s, stoplist=stoplist):
+    s=" ".join([word for word in s.split() if word not in stoplist])
+    return " ".join([stemmer.stem(re.sub('\.(?=$)', '', word)) for word in s.split()])
+
+
+"""
+There are many non-unique queries and products. To save time, in some cases we processed only unique entries.
+The following function applies str_parser() function to unique entries only.
+"""
+def col_parser(clmn, automatic_spell_check_dict={}, remove_from_brackets=False,parse_material=False,add_space_stop_list=[]):
+    t0 = time()
+    aa=list(set(list(clmn)))
+    my_dict={}
+    for i in range(0,len(aa)):
+        my_dict[aa[i]]=str_parser(aa[i],automatic_spell_check_dict=automatic_spell_check_dict, remove_from_brackets=remove_from_brackets,\
+                                    parse_material=parse_material,add_space_stop_list=add_space_stop_list)
+        if (i % 10000)==0:
+            print "parsed "+str(i)+" out of "+str(len(aa))+" unique values; "+str(round((time()-t0)/60,1))+" minutes"
+    return clmn.map(lambda x: my_dict[x])
+    
+
+
+"""
+Function to find similarities for a pair of words.
+First, for each word the lists of the corresponding WordNet synsets are retrieved.
+Second, max and mean similarities for the synset pairs in the lists are calculated.
+Similarity measures: path similarity, Leacock-Chodorow similarity and Resnik similarity.
+"""
+def find_similarity(w1,w2, nouns=True,CUT_VALUE=14.50):
+    if nouns==True:
+        lst1=wn.synsets(w1,pos=wn.NOUN)
+        lst2=wn.synsets(w2,pos=wn.NOUN)                          
+    else:
+        lst1=wn.synsets(w1)
+        lst2=wn.synsets(w2)       
+    if w1 in ['chipper', 'chippers']:
+        lst1=wn.synsets("shredder",pos=wn.NOUN)
+    if w2 in ['chipper', 'chippers']:
+        lst2=wn.synsets("shredder",pos=wn.NOUN)                   
+        
+    if w1 in ['lockset', 'locksets']:
+        lst1=wn.synsets("knob",pos=wn.NOUN)
+    if w2 in ['lockset', 'locksets']:
+        lst2=wn.synsets("knob",pos=wn.NOUN)  
+    similarities_list=[item1.path_similarity(item2)  for item1 in lst1 \
+                                for  item2 in lst2 \
+                                if item1.path_similarity(item2)!=None]                     
+
+    if len(similarities_list)==0:
+        max_similarity=0
+        mean_similarity=0
+    else:
+        max_similarity=max(similarities_list)
+        mean_similarity=np.mean(similarities_list)
+        
+    lch_similarities_list=[item1.lch_similarity(item2)  for item1 in lst1 \
+                                for  item2 in lst2 \
+                                if item1.pos()==item2.pos() and item1.lch_similarity(item2)!=None]                     
+
+    if len(lch_similarities_list)==0:
+        max_lch_similarity=0
+        mean_lch_similarity=0
+    else:
+        max_lch_similarity=max(lch_similarities_list)
+        mean_lch_similarity=np.mean(lch_similarities_list)
+        
+    res_similarities_list=[min(CUT_VALUE,item1.res_similarity(item
