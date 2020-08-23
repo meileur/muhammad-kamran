@@ -849,4 +849,121 @@ def vb_words(my_token_string):
 
 #The function gets the list of tagged words and returns gerunds (i.e. with tag 'VBG'). 
 def vbg_words(my_token_string):
-    my_token_l
+    my_token_list=parser_mystr2tuple(my_token_string,minLength=1)
+    output_list=[]
+    for i in range(0,len(my_token_list)):
+        if my_token_list[i][1].find('VBG')>=0:
+            output_list.append(my_token_list[i][0])
+    return " ".join(output_list)
+
+#The function gets the list of tagged words and returns adverbs and adjectives. 
+def jj_rb_words(my_token_string):
+    my_token_list=parser_mystr2tuple(my_token_string,minLength=1)
+    output_list=[]
+    for i in range(0,len(my_token_list)):
+        if my_token_list[i][1].find('JJ')>=0 or my_token_list[i][1].find('RB')>=0:
+            output_list.append(my_token_list[i][0])
+    return " ".join(output_list)
+
+#The function gets the list of tagged words and returns determiners. 
+def dt_words(my_token_string):
+    my_token_list=parser_mystr2tuple(my_token_string,minLength=1)
+    output_list=[]
+    for i in range(0,len(my_token_list)):
+        if my_token_list[i][1].find('DT')>=0:
+            output_list.append(my_token_list[i][0])
+    return " ".join(output_list)
+
+"""
+The functions returns words with dash. In parsed text such words are only those 
+which are formed by a digit followed by a measure units.
+For example, if '7 inch cover' is found in query, it will be transformed to '7-in cover' in parsed query.
+The function words_w_dash() applied to the latter string will return '7-in'.
+"""
+def words_w_dash(s):
+    output_list=[]
+    for word in s.split():
+        if word.find('-')>=0:
+            output_list.append(word)
+    return " ".join(output_list)
+    
+    
+"""    
+Tagger.
+Pass a pandas column to the tagger.
+Output is the column of tag strings.
+"""
+def col_tagger(colmn_parsed):
+    t0 = time()
+    NN=len(colmn_parsed)    
+    colmn_tokens = colmn_parsed.map(lambda x: [])
+    batch=20000   
+    
+    list_of_keys=colmn_parsed.keys()
+    i=0
+    while i<NN:
+        if i+batch<NN:
+            end_row=i+batch
+        else:
+            end_row=NN
+        str_batch=" : ".join(colmn_parsed[i:end_row])
+        tokens_batch=nltk.pos_tag(nltk.word_tokenize(str_batch))
+        #str_batch=None
+    
+        k=i
+        pos=0
+        while pos<len(tokens_batch):
+            if tokens_batch[pos][0]==":":
+                k+=1
+            else:
+                colmn_tokens[list_of_keys[k]].append(tokens_batch[pos])
+            pos+=1
+            #if (pos % 100000)==0:
+            #    print ""+str(pos)+" out of "+str(len(tokens_all))+" tokens"
+            
+        i+=batch
+        print "tagged "+str(min(i,NN))+" out of "+str(NN)+" total rows; "+str(round((time()-t0)/60,1))+" minutes"
+    return colmn_tokens
+ 
+
+"""    
+The following function is similar to col_tagger(),
+but it deals with each word separately. 
+The output should be the same if we supply only one word to NLTK.pos_tagger() 
+and retrive the tag. However, brute-force word-by-word processing is extemely inefficient,
+so we have to for one string of words separated by ';'
+"""   
+def col_wordtagger(colmn_parsed):
+    t0 = time()
+    colmn_parsed1=colmn_parsed.map(lambda x: " ; ".join(x.split()))
+    NN=len(colmn_parsed)    
+    colmn_tokens = colmn_parsed.map(lambda x: [])
+    batch=20000   
+    
+    list_of_keys=colmn_parsed.keys()
+    i=0
+    while i<NN:
+        if i+batch<NN:
+            end_row=i+batch
+        else:
+            end_row=NN
+        
+        str_batch=" : ".join(colmn_parsed1[i:end_row])
+        tokens_batch=nltk.pos_tag(nltk.word_tokenize(str_batch))
+        #str_batch=None
+    
+        k=i
+        pos=0
+        while pos<len(tokens_batch):
+            if tokens_batch[pos][0]==":":
+                k+=1
+            else:
+                if tokens_batch[pos][0]!=";":
+                    colmn_tokens[list_of_keys[k]].append(tokens_batch[pos])
+            pos+=1
+            #if (pos % 100000)==0:
+            #    print ""+str(pos)+" out of "+str(len(tokens_all))+" tokens"
+            
+        i+=batch
+        print "wordtagged "+str(min(i,NN))+" out of "+str(NN)+" total rows; "+str(round((time()-t0)/60,1))+" minutes"
+    return colmn_tokens
