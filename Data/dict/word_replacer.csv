@@ -1,0 +1,245 @@
+# This is the original dict Chenglong used for word replacement
+# Note that the comments are out-of-date, and we have
+# share everything need to be shared according to the rule
+# on the forum. See:
+# https://www.kaggle.com/buinyi/home-depot-product-search-relevance/disclosing-external-data
+#==================================================
+# Part I - NOT TO SHARE
+#==================================================
+#
+#--------------------------------------------------
+# Feature engineering (Ok not to share)
+# AB -> A B or A B -> AB
+#
+undercabinet,under cabinet
+snowerblower,snower blower
+mountreading,mount reading
+zeroturn,zero turn
+stemcartridge,stem cartridge
+greecianmarble,greecian marble
+outdoorfurniture,outdoor furniture
+outdoorlounge,outdoor lounge
+heaterconditioner,heater conditioner
+heater/conditioner,heater conditioner
+conditioner/heater,conditioner heater
+air condtion ,air conditioner 
+airconditioner,air conditioner
+snowbl,snow bl
+plexigla,plexi gla
+whirlpoolga,whirlpool ga
+whirlpoolstainless,whirlpool stainless
+nutdriver,nut driver
+screwdriving,screw driver
+screwdrivers,screw driver
+screwdriver,screw driver
+sedgehamm,sledge hamm
+childproof,child proof
+flatbraces,flat braces
+zmax,z max
+fireplace,fire place
+workbench,work bench
+hardwood,hard wood
+softwood,soft wood
+woodgrain,wood grain
+basswood,bass wood
+nailup,nail up
+nails,nail
+nailgun,nail gun
+nailer,nail
+nailers,nail
+7qquart,7 qt.
+sim tek,simtek
+mega shot,megashot
+shelter logic,shelterlogic
+gal vanized,galvanized
+battery powere weedeater,battery power weed eater
+nailup,nail up
+shark bite,sharkbite
+joist hanger,joisthanger
+rigid saw,ridgid saw
+black & decker,black and decker
+black+decker,black and decker
+black decker,black and decker
+black decke,black and decker
+phillips led,philips led
+exteriorpaint,exterior paint
+firewood,fire wood
+fuelpellets,fuel pellet
+bandsaw,band saw
+jogsaw,jog saw
+jigsaw,jig saw
+bandsaw,band saw
+hacksaw,hack saw
+skillsaw,skill saw
+polesaw,pole saw
+chainsaws,chain saw
+chainsaw,chain saw
+counterdepth,counter depth
+wirenuts,wire nut
+doorbell,door bell
+bathroom,bath room
+whitesilicone,white silicone
+whiteled,white led
+backerboard,backer board
+hardboard,hard board
+bathtub,bath tub
+cabinetwithouttops,cabinet without tops
+kitchenaid,kitchen aid
+castiron,cast iron
+pfistersaxton,pfister saxton 
+weedeater,weed eater
+splitbolt,split bolt
+soundfroofing,sound froofing
+snapstone,snap stone
+cornershower,corner shower
+stronglus,strong lus
+shopvac,shop vac
+shoplight,shop light
+spotlight,spot light
+airconditioner,air conditioner
+whirlpoolga,whirlpool ga
+whirlpoolstainless,whirlpool stainless
+snowblower,snow blower
+plexigla,plexi gla
+trashcan,trash can
+redwood,red wood
+mountspacesaver,mount space saver
+undercounter,under counter
+stairtreads,stair tread
+#
+#--------------------------------------------------
+# Feature engineering (Ok not to share)
+# A B -> AB
+#
+techni soil,technisoil
+in sulated,insulated
+stove top,stovetop
+steam fast,steamfast
+sand castle,sandcastle
+soft spring,softspring
+plasma wave,plasmawave
+rust[\s|-]ol[e|l]um ,rustoleum 
+c\s+u ,cu
+z-wave,zwave
+closet maid,closetmaid
+saw horse,sawhorse
+play set,playset
+in let,inlet
+wheel barrel,wheelbarrow
+we mo,wemo
+weather tech,weathertech
+weather vane,weathervane
+versa tube,versatube
+versa bond,versabond
+in termatic,intermatic
+therma cell,thermacell
+tuff screen,tuffscreen
+tow behind,towbehind
+top rail,toprail
+sani flo,saniflo
+timber lok,timberlok
+thin set,thinset
+thresh hold,threshold
+#
+#--------------------------------------------------
+# Feature engineering (OK not to share)
+# Stemming
+#
+cabinets,cabinet
+splitting,split
+splitter,split
+fencing,fence
+landscaping,landscape
+playsets,playset
+wooden,wood
+accessories,accessory
+lighting,light
+lights,light
+framed,frame
+drilling,drill
+filing,file
+shelving,shelf
+shelves,shelf
+shelve,shelf
+puller,pull
+winterizing,winterizer
+insulator,insulation
+cleaning,cleaner
+interconnected,interconnect
+decor,decoration
+decorator,decoration
+decorative,decoration
+welder,weld
+containing,container
+weatherstrip,weatherstripper
+waterproofer,water proof
+waterproofing,water proof
+abrasive,abrasion
+wider,wide
+protective,protect
+protection,protect
+protector,protect
+soldering,solder
+painter,paint
+louvered,louver
+repeller,repellent
+misting,mist
+mister,mist
+detection,detect
+detector,detect
+washing,washer
+tubing,tube
+railing,rail
+weather stripping,weatherstripper
+water proofing,water proof
+#
+#--------------------------------------------------
+# Synonym replacement (Ok not to share)
+#
+electrical,electric
+electronic,electric
+electronics,electric
+lamp,light
+stripper,remover
+wire,cable
+drape,curtain
+shelter,tent
+canopy,tent
+two pole ch breaker,double pole ch breaker
+#
+#--------------------------------------------------
+# Abbreviation conversion
+#
+a c,air condition
+bbq,barbeque
+elec.,electric
+elec,electric
+tv,television
+uv,ultraviolet
+vac,vacuum
+#
+#--------------------------------------------------
+# Feature engineering (OK not to share)
+# Pattern replacement
+#
+(^\.|/), 
+(\.|/)$, 
+([0-9])([a-z]), \1 \2
+([a-z])([0-9]), \1 \2
+([a-z])( *)\.( *)([a-z]), \1 \4
+([a-z])( *)/( *)([a-z]), \1 \4
+([0-9])( *)\.( *)([0-9]), \1.\4
+a\s*c[\s+|\$],air conditioner 
+#
+#--------------------------------------------------
+# Feature engineering (OK not to share)
+# Other
+#
+splashback,backsplash
+backsplashes,backsplash
+yardguard,yardgard
+access,accessory
+#
+#==================================================
+# Part II - SHARE ON THE FORUM
+#=============================================

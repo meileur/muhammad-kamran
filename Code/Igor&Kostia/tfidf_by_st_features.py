@@ -239,4 +239,98 @@ for i in range(len(df_all)):
     f8=(sum(idf_list[j][k])+0.0)/((d_length[j]+0.0)/len(idf_list[j]))
     f9=(sum(idf_list[j][k])+0.0)/((t_length[j]+0.0)/len(idf_list[j]))
     f10=(len(list(set(list(st_lu[j].split(" "))))) +0.0)/d_length[j]
-    f11=(len(list(set(list(st_lu[j].sp
+    f11=(len(list(set(list(st_lu[j].split(" "))))) +0.0)/t_length[j]
+    f12=len(list(set(list(st_lu[j].split(" "))))) /((d_length[j]+0.0)/len(idf_list[j]))
+    if (i%1000)==0:
+        print i
+
+    list1.append(f1)
+    list2.append(f2)
+    list3.append(f3)
+    list4.append(f4)
+    list5.append(f5)
+    list6.append(f6)
+    list7.append(f7)
+    list8.append(f8)
+    list9.append(f9)
+    list10.append(f10)
+    list11.append(f11)
+    list12.append(f12)
+
+list_of_list=[list1,list2,list3,list4,list5,list6,list7,list8,list9,list10,list11,list12]
+st_names=["id"]    
+for j in range(12):    
+    df_all["st_tfidf_"+str(j)]=list_of_list[j]
+    st_names.append("st_tfidf_"+str(j))
+        
+
+list1=list()
+list2=list()
+list3=list()
+list4=list()
+list5=list()
+list6=list()
+list7=list()
+list8=list()
+list9=list()
+list10=list()
+list11=list()
+list12=list()
+
+
+
+new_t=new_t1
+idf_list=idf_list1
+d_length=d_length1
+t_length=t_length1
+t=another_t
+
+
+#calculate features using st=search_term and pd=product_title
+
+for i in range(len(df_all)):
+    df_parsed=pt
+    #j =  st_lu.index(df_all["search_term_parsed"][i])
+    #k=t[j].index(df_all["product_title_parsed"][i])
+    j =  st_lu.index(df_all["search_term_stemmed"][i])
+    k=t[j].index(df_parsed[i])
+    if d_length[j]==0:
+        d_length[j]=1   
+    f1=(sum(idf_list[j][k])+0.0)/d_length[j]
+    f2=(sum(idf_list[j][k])+0.0)/t_length[j]
+    f3=d_length[j]
+    f4=t_length[j]
+    #f5=len(df_all["product_title_parsed"][i].split(" "))/len(list(set(new_t[j][k].split(" "))))
+    f5=len(df_parsed[i].split(" "))/len(list(set(new_t[j][k].split(" "))))
+    f6=(sum(idf_list[j][k])+0.0)*m.log(d_length[j])
+    f7=(sum(idf_list[j][k])+0.0)*m.log(t_length[j])
+    f8=(sum(idf_list[j][k])+0.0)/((d_length[j]+0.0)/len(idf_list[j]))
+    f9=(sum(idf_list[j][k])+0.0)/((t_length[j]+0.0)/len(idf_list[j]))
+    f10=(len(list(set(list(st_lu[j].split(" "))))) +0.0)/d_length[j]
+    f11=(len(list(set(list(st_lu[j].split(" "))))) +0.0)/t_length[j]
+    f12=len(list(set(list(st_lu[j].split(" "))))) /((d_length[j]+0.0)/len(idf_list[j]))
+    if (i%1000)==0:
+        print i
+
+    list1.append(f1)
+    list2.append(f2)
+    list3.append(f3)
+    list4.append(f4)
+    list5.append(f5)
+    list6.append(f6)
+    list7.append(f7)
+    list8.append(f8)
+    list9.append(f9)
+    list10.append(f10)
+    list11.append(f11)
+    list12.append(f12)
+
+
+for j in range(12):    
+    df_all["st_tfidf_"+str(j)"+".1"]=list_of_list[j]
+    st_names.append("st_tfidf_"+str(j)"+".1")
+
+#save features
+b=df_all[st_names]
+b.to_csv(FEATURES_DIR+"/df_st_tfidf.csv", index=False) 
+
