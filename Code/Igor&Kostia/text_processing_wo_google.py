@@ -7,6 +7,10 @@ we found it to be very efficient to make all preprocessing first and only then m
 feature generation. It is because the same processed text is used as an input to
 generate several different features. 
 
+This file is the same as text_processing.py, except this line is commented
+df_all['search_term']=df_all['search_term'].map(lambda x: google_dict[x] if x in google_dict.keys() else x)   
+and the ouput is saved with '_wo_google' added to file names.
+
 Competition: HomeDepot Search Relevance
 Author: Igor Buinyi
 Team: Turing test
@@ -98,7 +102,8 @@ print len(add_space_stop_list) ," total words from brands and product titles in 
 ##### from the forum
 # https://www.kaggle.com/steubk/home-depot-product-search-relevance/fixing-typos
 
-df_all['search_term']=df_all['search_term'].map(lambda x: google_dict[x] if x in google_dict.keys() else x)   
+## the following line is commented in this file
+####df_all['search_term']=df_all['search_term'].map(lambda x: google_dict[x] if x in google_dict.keys() else x)   
 
 
 
@@ -265,7 +270,7 @@ for word in my_dict.keys():
 
 ### save dictionary
 corrections_df=pd.DataFrame(errors_dict).transpose()
-corrections_df.to_csv(PROCESSINGTEXT_DIR+"/automatically_generated_word_corrections.csv")
+corrections_df.to_csv(PROCESSINGTEXT_DIR+"/automatically_generated_word_corrections_wo_google.csv")
 
 print 'building spell checker time:',round((time()-t0)/60,1) ,'minutes\n'
 
@@ -282,7 +287,7 @@ for word in errors_dict.keys():
 
 """
 spell_check_dict={}
-with open(PROCESSINGTEXT_DIR+'/automatically_generated_word_corrections.csv') as csvfile:
+with open(PROCESSINGTEXT_DIR+"/automatically_generated_word_corrections_wo_google.csv") as csvfile:
      reader = csv.DictReader(csvfile)
      for row in reader:
          if row['suggestion']!="":
@@ -515,13 +520,13 @@ for key in del_list:
 
 # save to file
 brand_df=pd.DataFrame(brand_dict).transpose()
-brand_df.to_csv(PROCESSINGTEXT_DIR+"/brand_statistics.csv")
+brand_df.to_csv(PROCESSINGTEXT_DIR+"/brand_statistics_wo_google.csv")
 
 
 """
 brand_dict={}
 import csv
-with open(PROCESSINGTEXT_DIR+'/brand_statistics.csv') as csvfile:
+with open(PROCESSINGTEXT_DIR+"/brand_statistics_wo_google.csv") as csvfile:
     reader = csv.DictReader(csvfile)
     for row in reader:
         brand_dict[row['name']]={'cnt_attribute': int(row['cnt_attribute']), 'cnt_query': int(row['cnt_query']), 
@@ -610,7 +615,8 @@ material_dict=get_attribute_dict(list_materials,str_query=str_query)
 
 ### create dataframe and save to file
 material_df=pd.DataFrame(material_dict).transpose()
-material_df.to_csv(PROCESSINGTEXT_DIR+"/material_statistics.csv")
+material_df.to_csv(PROCESSINGTEXT_DIR+"/material_statistics_wo_google.csv")
+
 
 
 ### For further processing keep only materials that appear 
@@ -753,7 +759,7 @@ for i in range(0,len(df_attr['product_uid'])):
         print "Read",i,"out of", len(df_attr['product_uid']), "rows in attributes.csv in", round((time()-t0)/60,1) ,'minutes'
     if df_attr['name'][i][0:6]=="Bullet":
         dict_attr[int(df_attr['product_uid'][i])]['attribute_bullets'].append(df_attr['value'][i])
-
+            
 if 0 in dict_attr.keys():
     del(dict_attr[0])
                         
@@ -1243,10 +1249,10 @@ t0 = time()
 
 ### Save everything into files
 df_all['product_title']= df_all['product_title'].map(lambda x: x.encode('utf-8'))
-df_all.to_csv(PROCESSINGTEXT_DIR+"/df_train_and_test_processed.csv", index=False)
+df_all.to_csv(PROCESSINGTEXT_DIR+"/df_train_and_test_processed_wo_google.csv", index=False)
 
-df_attr_bullets.to_csv(PROCESSINGTEXT_DIR+"/df_attribute_bullets_processed.csv", index=False)
-df_pro_desc.to_csv(PROCESSINGTEXT_DIR+"/df_product_descriptions_processed.csv", index=False)
+df_attr_bullets.to_csv(PROCESSINGTEXT_DIR+"/df_attribute_bullets_processed_wo_google.csv", index=False)
+df_pro_desc.to_csv(PROCESSINGTEXT_DIR+"/df_product_descriptions_processed_wo_google.csv", index=False)
 
 
 print 'TOTAL PROCESSING TIME:',round((time()-t1)/60,1) ,'minutes\n'
