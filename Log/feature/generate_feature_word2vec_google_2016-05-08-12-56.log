@@ -1,0 +1,15 @@
+[2016-05-10 05:56:29,925] INFO: loading projection weights from ../../Data/word2vec/GoogleNews-vectors-negative300.bin
+[2016-05-10 05:57:50,106] INFO: loaded (3000000, 300) matrix from ../../Data/word2vec/GoogleNews-vectors-negative300.bin
+[2016-05-10 05:57:55,687] INFO: Word2Vec_GoogleNews_D300_Importance_search_term_x_product_title_1D (1D): corr = 0.001715
+[2016-05-10 05:58:27,251] INFO: Word2Vec_GoogleNews_D300_Importance_search_term_x_product_description_1D (1D): corr = 0.002783
+[2016-05-10 05:58:56,836] INFO: Word2Vec_GoogleNews_D300_Importance_search_term_x_product_attribute_1D (1D): corr = -0.087042
+[2016-05-10 05:58:59,631] INFO: Word2Vec_GoogleNews_D300_Importance_search_term_x_product_brand_1D (1D): corr = -0.038736
+[2016-05-10 05:59:02,418] INFO: Word2Vec_GoogleNews_D300_Importance_search_term_x_product_color_1D (1D): corr = -0.017622
+[2016-05-10 05:59:42,526] INFO: Word2Vec_GoogleNews_D300_N_Similarity_search_term_x_product_title_1D (1D): corr = 0.151806
+[2016-05-10 06:01:57,668] INFO: Word2Vec_GoogleNews_D300_N_Similarity_search_term_x_product_description_1D (1D): corr = 0.065256
+[2016-05-10 06:04:04,362] INFO: Word2Vec_GoogleNews_D300_N_Similarity_search_term_x_product_attribute_1D (1D): corr = -0.119025
+[2016-05-10 06:04:22,647] INFO: Word2Vec_GoogleNews_D300_N_Similarity_search_term_x_product_brand_1D (1D): corr = -0.067193
+[2016-05-10 06:04:37,913] INFO: Word2Vec_GoogleNews_D300_N_Similarity_search_term_x_product_color_1D (1D): corr = -0.042944
+[2016-05-10 06:05:24,198] INFO: Word2Vec_GoogleNews_D300_N_Similarity_Imp_search_term_x_product_title_1D (1D): corr = 0.158915
+[2016-05-10 06:08:12,024] INFO: Word2Vec_GoogleNews_D300_N_Similarity_Imp_search_term_x_product_description_1D (1D): corr = 0.066604
+[2016-05-10 06:10:49,015] INFO: Word2Vec_GoogleNews_D300_N_Similarity_Imp_search_term_x_product_attribute_1D (1D): corr = -0.114
